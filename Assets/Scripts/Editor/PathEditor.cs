@@ -36,16 +36,38 @@ public class PathEditor : Editor
         Handles.BeginGUI();        
 
         SetAsActualPath();
+        DeleteActualPath();
 
-        if(pathsSaved != null)
+        if (pathsSaved != null)
             pathsSaved.angleToRotate = EditorGUILayout.IntField("Angle to rotate", pathsSaved.angleToRotate, GUILayout.Width(300));
 
-        var addValue = 30 / Vector3.Distance(Camera.current.transform.position, _target.transform.position);
+        float addValue = 0;
 
-        DrawButton("↻", _target.transform.position + Camera.current.transform.up * addValue ,Direction.Left);
-        DrawButton("↺", _target.transform.position - Camera.current.transform.up * addValue ,Direction.Right);
+        if(_target != null)
+        {
+            addValue = 30 / Vector3.Distance(Camera.current.transform.position, _target.transform.position);
+            DrawButton("↻", _target.transform.position + Camera.current.transform.up * addValue, Direction.Left);
+            DrawButton("↺", _target.transform.position - Camera.current.transform.up * addValue, Direction.Right);
+        }       
 
         Handles.EndGUI();
+    }
+
+    void DeleteActualPath()
+    {
+        if (GUI.Button(new Rect(20, 100, 130, 30), "Delete path"))
+        {
+            DestroyImmediate(_target.gameObject);
+            
+            pathsSaved.paths.Remove(pathsSaved.paths[_target.id]);
+            pathsSaved.objectType.Remove(pathsSaved.objectType[_target.id]);
+            pathsSaved.positions.Remove(pathsSaved.positions[_target.id]);
+
+            for (int i = _target.id; i < pathsSaved.paths.Count; i++)
+            {
+                pathsSaved.paths[i].GetComponent<Path>().id--;
+            }
+        }
     }
 
     private void DrawButton(string text, Vector3 position , Direction dir)
@@ -85,7 +107,7 @@ public class PathEditor : Editor
         _target.currentIndex = EditorGUILayout.Popup("Actual type", _target.currentIndex, pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
 
         ShowPreview();
-        //_target.id = EditorGUILayout.IntField("ID", _target.id);
+        _target.id = EditorGUILayout.IntField("ID", _target.id);
 
         SwitchType();
     }
