@@ -16,6 +16,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     private int click;
     public PathConfig pathsSaved;
     private string _fullPath;
+    private Seed _seed;
 
     [MenuItem("Level options/Save new map")] // La ubicación dentro del editor de Unity
     static void CreateWindow() // Crea la ventana a mostrar
@@ -28,6 +29,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     public void Init()
     {
         pathsSaved = (PathConfig)Resources.Load("PathConfig");
+        _seed = GameObject.FindGameObjectWithTag("Seed").GetComponent<Seed>();
     }
 
     public void SaveMap()
@@ -76,6 +78,8 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                             if (currentMapName[0] == _mapName)
                             {
                                 currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
+                                _seed.mapNameLoaded = _mapName;
+                                _seed.mapLoaded = true;
                                 break;
                             }
                         }

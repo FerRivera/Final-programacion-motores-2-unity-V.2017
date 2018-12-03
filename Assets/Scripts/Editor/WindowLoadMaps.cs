@@ -61,9 +61,7 @@ public class WindowLoadMaps : EditorWindow
             
             EditorGUI.BeginDisabledGroup(true);
             currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
-            EditorGUI.EndDisabledGroup();
-
-            _seed.mapNameLoaded = currentMapName[0];
+            EditorGUI.EndDisabledGroup();            
 
             if (!wantToDeleteList[i])
             {
@@ -81,11 +79,17 @@ public class WindowLoadMaps : EditorWindow
                 if (GUILayout.Button("Yes") && wantToDeleteList[i])
                 {
                     AssetDatabase.DeleteAsset(path);
+
+                    if(currentMapName[0] == _seed.mapNameLoaded)
+                    {
+                        _seed.mapLoaded = false;
+                    }
                 }
             }
 
             if(GUILayout.Button("Load map"))
             {
+                _seed.mapNameLoaded = currentMapName[0];
                 currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
                 LoadMapOnScene(currentMap);
             }
