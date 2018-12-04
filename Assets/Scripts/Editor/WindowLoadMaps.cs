@@ -115,6 +115,8 @@ public class WindowLoadMaps : EditorWindow
         pathsSaved.paths.Clear();
         pathsSaved.objectType.Clear();
         pathsSaved.positions.Clear();
+        pathsSaved.rotations.Clear();
+
         pathsSaved.vessels.Clear();
         pathsSaved.vesselsType.Clear();
         pathsSaved.vesselsPositions.Clear();
@@ -128,10 +130,12 @@ public class WindowLoadMaps : EditorWindow
             path.AddComponent<Path>().currentIndex = map.objectType[i];
             path.GetComponent<Path>().lastIndex = map.objectType[i];
             path.GetComponent<Path>().id = i;
+            path.transform.rotation = map.rotations[i];
 
             pathsSaved.paths.Add(path);
             pathsSaved.objectType.Add(map.objectType[i]);
             pathsSaved.positions.Add(path.transform.position);
+            pathsSaved.rotations.Add(path.transform.rotation);
         }
 
         _seed.transform.position = map.positions[count - 1];       

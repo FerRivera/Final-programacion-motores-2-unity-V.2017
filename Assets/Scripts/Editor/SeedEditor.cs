@@ -133,6 +133,7 @@ public class SeedEditor : Editor
             pathsSaved.paths.Clear();
             pathsSaved.objectType.Clear();
             pathsSaved.positions.Clear();
+            pathsSaved.rotations.Clear();
 
             pathsSaved.vessels.Clear();
             pathsSaved.vesselsPositions.Clear();
@@ -153,8 +154,9 @@ public class SeedEditor : Editor
             {
                 var lastObject = pathsSaved.paths.LastOrDefault();
 
-                pathsSaved.objectType.RemoveAt(pathsSaved.paths.Count-1);
-                pathsSaved.positions.RemoveAt(pathsSaved.paths.Count-1);
+                pathsSaved.objectType.RemoveAt(pathsSaved.objectType.Count-1);
+                pathsSaved.positions.RemoveAt(pathsSaved.positions.Count-1);
+                pathsSaved.rotations.RemoveAt(pathsSaved.rotations.Count-1);
                 pathsSaved.paths.Remove(lastObject);
 
                 if (pathsSaved.paths.LastOrDefault() != null)
@@ -258,6 +260,7 @@ public class SeedEditor : Editor
         pathsSaved.paths.Add(path);
         pathsSaved.objectType.Add(_target.selectedIndex);
         pathsSaved.positions.Add(path.transform.position);
+        pathsSaved.rotations.Add(path.transform.rotation);
     }
 
     public void SaveMap()
@@ -302,6 +305,7 @@ public class SeedEditor : Editor
                     currentMap.paths.Clear();
                     currentMap.objectType.Clear();
                     currentMap.positions.Clear();
+                    currentMap.rotations.Clear();
 
                     currentMap.vessels.Clear();
                     currentMap.VesselsType.Clear();
@@ -310,6 +314,7 @@ public class SeedEditor : Editor
                     currentMap.paths.AddRange(pathsSaved.paths);
                     currentMap.objectType.AddRange(pathsSaved.objectType);
                     currentMap.positions.AddRange(pathsSaved.positions);
+                    currentMap.rotations.AddRange(pathsSaved.rotations);
 
                     currentMap.vessels.AddRange(pathsSaved.vessels);
                     currentMap.VesselsType.AddRange(pathsSaved.vesselsType);

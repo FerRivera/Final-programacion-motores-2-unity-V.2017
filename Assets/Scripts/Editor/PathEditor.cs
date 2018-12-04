@@ -62,6 +62,7 @@ public class PathEditor : Editor
             pathsSaved.paths.Remove(pathsSaved.paths[_target.id]);
             pathsSaved.objectType.Remove(pathsSaved.objectType[_target.id]);
             pathsSaved.positions.Remove(pathsSaved.positions[_target.id]);
+            pathsSaved.rotations.Remove(pathsSaved.rotations[_target.id]);
 
             for (int i = _target.id; i < pathsSaved.paths.Count; i++)
             {
@@ -92,12 +93,15 @@ public class PathEditor : Editor
         if (GUI.Button(r, text))
         {            
             if (dir == Direction.Left)            
-                _target.transform.Rotate(new Vector3(0, pathsSaved.angleToRotate, 0));            
-            else
-                _target.transform.Rotate(new Vector3(0,-pathsSaved.angleToRotate, 0));
+                _target.transform.Rotate(new Vector3(0, pathsSaved.angleToRotate, 0));
+            else            
+                _target.transform.Rotate(new Vector3(0, -pathsSaved.angleToRotate, 0));
+
+            pathsSaved.rotations[_target.id] = _target.transform.rotation;
         }
 
     }
+
     private void ShowValues()
     {
         pathsSaved = (PathConfig)Resources.Load("PathConfig");

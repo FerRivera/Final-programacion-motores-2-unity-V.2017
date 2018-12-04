@@ -89,6 +89,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                             currentMap.paths.AddRange(pathsSaved.paths);
                             currentMap.objectType.AddRange(pathsSaved.objectType);
                             currentMap.positions.AddRange(pathsSaved.positions);
+                            currentMap.rotations.AddRange(pathsSaved.rotations);
 
                             currentMap.vessels.AddRange(pathsSaved.vessels);
                             currentMap.VesselsType.AddRange(pathsSaved.vesselsType);
