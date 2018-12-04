@@ -57,17 +57,25 @@ public class PathEditor : Editor
     {
         if (GUI.Button(new Rect(20, 100, 130, 30), "Delete path"))
         {
-            pathsSaved.paths.Remove(pathsSaved.paths[_target.id]);
-            pathsSaved.objectType.Remove(pathsSaved.objectType[_target.id]);
-            pathsSaved.positions.Remove(pathsSaved.positions[_target.id]);
-            pathsSaved.rotations.Remove(pathsSaved.rotations[_target.id]);
+            var temp = pathsSaved.paths[_target.id];
+            var tempID = temp.GetComponent<Path>().id;
 
-            DestroyImmediate(_target.gameObject);
+            pathsSaved.paths.RemoveAt(tempID);
+            pathsSaved.objectType.RemoveAt(tempID);
+            pathsSaved.positions.RemoveAt(tempID);
+            pathsSaved.rotations.RemoveAt(tempID);
 
-            for (int i = _target.id; i < pathsSaved.paths.Count; i++)
+            //pathsSaved.paths.Remove(temp);
+            //pathsSaved.objectType.Remove(pathsSaved.objectType[tempID]);
+            //pathsSaved.positions.Remove(pathsSaved.positions[tempID]);
+            //pathsSaved.rotations.Remove(pathsSaved.rotations[tempID]);
+
+            for (int i = pathsSaved.paths.Count - 1; i >= _target.id; i--)
             {
                 pathsSaved.paths[i].GetComponent<Path>().id--;
             }
+
+            DestroyImmediate(temp);            
         }
     }
 
