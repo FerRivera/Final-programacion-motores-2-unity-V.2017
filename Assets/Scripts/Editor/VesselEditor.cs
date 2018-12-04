@@ -66,15 +66,17 @@ public class VesselEditor : Editor
             vessel.GetComponent<Vessel>().lastIndex = _target.currentIndex;
             vessel.GetComponent<Vessel>().id = _target.id;
 
-            DestroyImmediate(_pathsSaved.vessels[_target.id]);
+            var temp = _pathsSaved.vessels[_target.id];
 
-            _pathsSaved.vessels.Remove(_pathsSaved.vessels[_target.id]);
-            _pathsSaved.vesselsType.Remove(_pathsSaved.vesselsType[_target.id]);
-            _pathsSaved.vesselsPositions.Remove(_pathsSaved.vesselsPositions[_target.id]);
+            _pathsSaved.vessels[_target.id] = vessel;
+            _pathsSaved.vesselsType[_target.id] = vessel.GetComponent<Vessel>().currentIndex;
+            _pathsSaved.vesselsPositions[_target.id] = vessel.transform.position;
 
-            _pathsSaved.vessels.Insert(_target.id, vessel);
-            _pathsSaved.vesselsType.Insert(_target.id, vessel.GetComponent<Vessel>().currentIndex);
-            _pathsSaved.vesselsPositions.Insert(_target.id, vessel.transform.position);
+            DestroyImmediate(temp);
+
+            //_pathsSaved.vessels.Insert(_target.id, vessel);
+            //_pathsSaved.vesselsType.Insert(_target.id, vessel.GetComponent<Vessel>().currentIndex);
+            //_pathsSaved.vesselsPositions.Insert(_target.id, vessel.transform.position);
 
             Selection.activeObject = vessel;
         }

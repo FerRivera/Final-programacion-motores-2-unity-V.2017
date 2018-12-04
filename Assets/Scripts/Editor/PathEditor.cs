@@ -57,12 +57,12 @@ public class PathEditor : Editor
     {
         if (GUI.Button(new Rect(20, 100, 130, 30), "Delete path"))
         {
-            DestroyImmediate(_target.gameObject);
-            
             pathsSaved.paths.Remove(pathsSaved.paths[_target.id]);
             pathsSaved.objectType.Remove(pathsSaved.objectType[_target.id]);
             pathsSaved.positions.Remove(pathsSaved.positions[_target.id]);
             pathsSaved.rotations.Remove(pathsSaved.rotations[_target.id]);
+
+            DestroyImmediate(_target.gameObject);
 
             for (int i = _target.id; i < pathsSaved.paths.Count; i++)
             {
@@ -141,15 +141,17 @@ public class PathEditor : Editor
             path.GetComponent<Path>().lastIndex = _target.currentIndex;
             path.GetComponent<Path>().id = _target.id;
 
-            DestroyImmediate(pathsSaved.paths[_target.id]);
+            var temp = pathsSaved.paths[_target.id];
 
-            pathsSaved.paths.Remove(pathsSaved.paths[_target.id]);
-            pathsSaved.objectType.Remove(pathsSaved.objectType[_target.id]);
-            pathsSaved.positions.Remove(pathsSaved.positions[_target.id]);
+            pathsSaved.paths[_target.id] = path;
+            pathsSaved.objectType[_target.id] = path.GetComponent<Path>().currentIndex;
+            pathsSaved.positions[_target.id] = path.transform.position;
 
-            pathsSaved.paths.Insert(_target.id, path);
-            pathsSaved.objectType.Insert(_target.id, path.GetComponent<Path>().currentIndex);
-            pathsSaved.positions.Insert(_target.id, path.transform.position);
+            //pathsSaved.paths.Insert(_target.id, path);
+            //pathsSaved.objectType.Insert(_target.id, path.GetComponent<Path>().currentIndex);
+            //pathsSaved.positions.Insert(_target.id, path.transform.position);
+
+            DestroyImmediate(temp);
 
             Selection.activeObject = path;
         }
@@ -162,6 +164,7 @@ public class PathEditor : Editor
             pathsSaved.paths[pathsSaved.paths.Count - 1].GetComponent<Path>().id = _target.id;
 
             _seed.transform.position = _target.transform.position;
+
             Swap(pathsSaved.paths, _target.id, pathsSaved.paths.Count-1);
             Swap(pathsSaved.positions, _target.id, pathsSaved.positions.Count-1);
             Swap(pathsSaved.objectType, _target.id, pathsSaved.objectType.Count-1);

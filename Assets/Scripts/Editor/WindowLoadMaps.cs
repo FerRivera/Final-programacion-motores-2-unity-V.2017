@@ -148,7 +148,7 @@ public class WindowLoadMaps : EditorWindow
             vessel.transform.position = map.vesselsPositions[i];
             vessel.AddComponent<Vessel>().currentIndex = map.VesselsType[i];
             vessel.GetComponent<Vessel>().lastIndex = map.VesselsType[i];
-            //vessel.GetComponent<Vessel>().id = i;
+            vessel.GetComponent<Vessel>().id = i;
 
             pathsSaved.vessels.Add(vessel);
             pathsSaved.vesselsType.Add(map.VesselsType[i]);
