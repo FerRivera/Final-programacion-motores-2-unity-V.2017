@@ -27,14 +27,19 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     }
 
     public void Init()
-    {
+    {    
         pathsSaved = (PathConfig)Resources.Load("PathConfig");
+
         _seed = GameObject.FindGameObjectWithTag("Seed").GetComponent<Seed>();
+
         CalculatePolygons();
     }
 
     void CalculatePolygons()
     {
+        if (pathsSaved == null)
+            return;
+
         pathsSaved.totalPolygons = 0;
 
         foreach (var item in pathsSaved.paths)
@@ -44,10 +49,21 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                 pathsSaved.totalPolygons += item.GetComponent<MeshFilter>().sharedMesh.triangles.Length / 3;
             }
         }
+
+        foreach (var item in pathsSaved.vessels)
+        {
+            if (item.GetComponent<MeshFilter>() != null)
+            {
+                pathsSaved.totalPolygons += item.GetComponent<MeshFilter>().sharedMesh.triangles.Length / 3;
+            }
+        }
     }
 
     public void SaveMap()
-    {        
+    {
+        if (pathsSaved == null)
+            return;
+
         _mapName = EditorGUILayout.TextField("Map name", _mapName);
 
         EditorGUI.BeginDisabledGroup(true);
@@ -156,5 +172,10 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     void OnGUI() // Todo lo que se muestra en la ventana
     {
         SaveMap();        
+    }
+
+    private void OnFocus()
+    {
+        CalculatePolygons();
     }
 }

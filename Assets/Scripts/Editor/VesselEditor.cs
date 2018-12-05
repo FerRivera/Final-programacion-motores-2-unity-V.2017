@@ -82,6 +82,40 @@ public class VesselEditor : Editor
         }
     }
 
+    void OnSceneGUI()
+    {
+        Handles.BeginGUI();
+
+        DeleteActualVessel();
+
+        Handles.EndGUI();
+    }
+
+    void DeleteActualVessel()
+    {
+        if (GUI.Button(new Rect(20, 20, 130, 30), "Delete vessel"))
+        {
+            var temp = _pathsSaved.vessels[_target.id];
+            var tempID = temp.GetComponent<Vessel>().id;
+
+            _pathsSaved.vessels.RemoveAt(tempID);
+            _pathsSaved.vesselsType.RemoveAt(tempID);
+            _pathsSaved.vesselsPositions.RemoveAt(tempID);
+
+            //pathsSaved.paths.Remove(temp);
+            //pathsSaved.objectType.Remove(pathsSaved.objectType[tempID]);
+            //pathsSaved.positions.Remove(pathsSaved.positions[tempID]);
+            //pathsSaved.rotations.Remove(pathsSaved.rotations[tempID]);
+
+            for (int i = _pathsSaved.vessels.Count - 1; i >= _target.id; i--)
+            {
+                _pathsSaved.vessels[i].GetComponent<Vessel>().id--;
+            }
+
+            DestroyImmediate(temp);
+        }
+    }
+
     private void FixValues()
     {
 
