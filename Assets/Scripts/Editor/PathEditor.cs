@@ -154,6 +154,7 @@ public class PathEditor : Editor
             pathsSaved.paths[_target.id] = path;
             pathsSaved.objectType[_target.id] = path.GetComponent<Path>().currentIndex;
             pathsSaved.positions[_target.id] = path.transform.position;
+            pathsSaved.rotations[_target.id] = path.transform.rotation;
 
             //pathsSaved.paths.Insert(_target.id, path);
             //pathsSaved.objectType.Insert(_target.id, path.GetComponent<Path>().currentIndex);
@@ -176,6 +177,7 @@ public class PathEditor : Editor
             Swap(pathsSaved.paths, _target.id, pathsSaved.paths.Count-1);
             Swap(pathsSaved.positions, _target.id, pathsSaved.positions.Count-1);
             Swap(pathsSaved.objectType, _target.id, pathsSaved.objectType.Count-1);
+            Swap(pathsSaved.rotations, _target.id, pathsSaved.rotations.Count-1);
 
             _target.id = pathsSaved.paths.Count-1;
 
