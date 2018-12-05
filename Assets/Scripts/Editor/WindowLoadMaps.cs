@@ -61,6 +61,7 @@ public class WindowLoadMaps : EditorWindow
             
             EditorGUI.BeginDisabledGroup(true);
             currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
+            EditorGUILayout.IntField("Total polygons:", AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons);
             EditorGUI.EndDisabledGroup();            
 
             if (!wantToDeleteList[i])

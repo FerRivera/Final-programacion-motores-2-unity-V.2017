@@ -48,7 +48,7 @@ public class SeedEditor : Editor
 
         _target.selectedIndex = EditorGUILayout.Popup("Path to create", _target.selectedIndex, pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
 
-        ShowPreview();
+        ShowPreview();        
     }
 
     private void FixValues()
@@ -70,7 +70,7 @@ public class SeedEditor : Editor
         DrawButton("+", _target.transform.position + Camera.current.transform.up * addValue);
         DrawButton("+", _target.transform.position - Camera.current.transform.up * addValue);
         DrawButton("+", _target.transform.position + Camera.current.transform.right * addValue);
-        DrawButton("+", _target.transform.position - Camera.current.transform.right * addValue);
+        DrawButton("+", _target.transform.position - Camera.current.transform.right * addValue);        
 
         SaveMap();
         Handles.EndGUI();
@@ -106,6 +106,8 @@ public class SeedEditor : Editor
             GUILayout.EndHorizontal();
         }
     }
+
+    
 
     void RestartMap()
     {

@@ -30,6 +30,20 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     {
         pathsSaved = (PathConfig)Resources.Load("PathConfig");
         _seed = GameObject.FindGameObjectWithTag("Seed").GetComponent<Seed>();
+        CalculatePolygons();
+    }
+
+    void CalculatePolygons()
+    {
+        pathsSaved.totalPolygons = 0;
+
+        foreach (var item in pathsSaved.paths)
+        {
+            if (item.GetComponent<MeshFilter>() != null)
+            {
+                pathsSaved.totalPolygons += item.GetComponent<MeshFilter>().sharedMesh.triangles.Length / 3;
+            }
+        }
     }
 
     public void SaveMap()
@@ -38,6 +52,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
 
         EditorGUI.BeginDisabledGroup(true);
         _fullPath = EditorGUILayout.TextField("Path Selected", _fullPath);
+        pathsSaved.totalPolygons = EditorGUILayout.IntField("Total polygons:", pathsSaved.totalPolygons);
         EditorGUI.EndDisabledGroup();
 
         if (GUILayout.Button("Select folder"))
@@ -77,7 +92,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                             //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
                             if (currentMapName[0] == _mapName)
                             {
-                                currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
+                                currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);                                
                                 _seed.mapNameLoaded = _mapName;
                                 _seed.mapLoaded = true;
                                 break;
@@ -95,6 +110,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                             currentMap.VesselsType.AddRange(pathsSaved.vesselsType);
                             currentMap.vesselsPositions.AddRange(pathsSaved.vesselsPositions);
 
+                            currentMap.totalPolygons = pathsSaved.totalPolygons;
                             //esto hace que cuando cierro unity y lo vuelvo a abrir no se pierda la info
                             EditorUtility.SetDirty(currentMap);
                         }

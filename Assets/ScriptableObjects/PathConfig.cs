@@ -10,6 +10,7 @@ public class PathConfig : ScriptableObject
     public List<Quaternion> rotations = new List<Quaternion>();
     public List<Object> objectsToInstantiate = new List<Object>();
     public int angleToRotate;
+    public int totalPolygons;
     public List<GameObject> vessels = new List<GameObject>();
     public List<Vector3> vesselsPositions = new List<Vector3>();
     public List<int> vesselsType = new List<int>();
