@@ -66,7 +66,7 @@ public class SeedEditor : Editor
 
         DeleteLastPath();
         DeleteLastVessel();
-
+        
         DrawButton("+", _target.transform.position + Camera.current.transform.up * addValue);
         DrawButton("+", _target.transform.position - Camera.current.transform.up * addValue);
         DrawButton("+", _target.transform.position + Camera.current.transform.right * addValue);
@@ -263,7 +263,7 @@ public class SeedEditor : Editor
         pathsSaved.objectType.Add(_target.selectedIndex);
         pathsSaved.positions.Add(path.transform.position);
         pathsSaved.rotations.Add(path.transform.rotation);
-    }
+    }    
 
     public void SaveMap()
     {

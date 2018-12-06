@@ -12,11 +12,13 @@ public class WindowLoadMaps : EditorWindow
     public float maxXSize = 500;
     public PathConfig pathsSaved;
     private Seed _seed;
+    string _searchMap;
 
     [MenuItem("Level options/Load map")]
     static void CreateWindow()
     {
         var window = ((WindowLoadMaps)GetWindow(typeof(WindowLoadMaps)));
+        window.titleContent = new GUIContent("Load map");
         window.Show();
         window.Init();        
     }
@@ -42,10 +44,17 @@ public class WindowLoadMaps : EditorWindow
     {       
         List<string> tempPath = new List<string>();
 
-        var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
+        var asset = AssetDatabase.FindAssets("t:MapsSaved", null);                
+
+        _searchMap = EditorGUILayout.TextField("Search map:", _searchMap);        
+
+        EditorGUILayout.Space();
+
+        if (asset.Length <= 0)
+            EditorGUILayout.HelpBox("There are no maps saved! You have to create a new one before", MessageType.Info);
 
         EditorGUILayout.BeginVertical(GUILayout.Height(maxYSize));
-        _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, true, true);
+        _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, true, true);        
 
         MapsSaved currentMap = null;
 
@@ -58,11 +67,15 @@ public class WindowLoadMaps : EditorWindow
             //obtengo la ultima parte, que seria el nombre con la extension y saco la extension
             var currentMapName = tempPath.LastOrDefault().Split('.');
             //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
-            
+
+            if(!string.IsNullOrEmpty(_searchMap))
+                if (currentMapName[0] != _searchMap)
+                    continue;
+
             EditorGUI.BeginDisabledGroup(true);
             currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
             EditorGUILayout.IntField("Total polygons:", AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons);
-            EditorGUI.EndDisabledGroup();            
+            EditorGUI.EndDisabledGroup();
 
             if (!wantToDeleteList[i])
             {
