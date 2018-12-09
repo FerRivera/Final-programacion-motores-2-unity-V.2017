@@ -8,4 +8,15 @@ public class Vessel : MonoBehaviour
     public int currentIndex;
     public int selectedIndex;
     public int id;
+    public float distanceBetweenVessels;
+
+    private void Start()
+    {
+
+    }
+
+    private void Update()
+    {
+        
+    }
 }

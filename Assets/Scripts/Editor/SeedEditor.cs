@@ -19,12 +19,21 @@ public class SeedEditor : Editor
 
     public PathConfig pathsSaved;
 
-    public bool restartMap = false;
+    public bool newMap = false;
     public bool saveMap = false;
 
     void OnEnable()
     {
         _target = (Seed)target;
+
+        pathsSaved = (PathConfig)Resources.Load("PathConfig");
+
+        if (pathsSaved == null)
+        {
+            ScriptableObjectsCreator.CreatePathConfig();
+            pathsSaved = (PathConfig)Resources.Load("PathConfig");
+        }
+        //SceneView.onSceneGUIDelegate += OnScene;
     }
 
     public override void OnInspectorGUI()
@@ -42,8 +51,6 @@ public class SeedEditor : Editor
 
     private void ShowValues()
     {
-        pathsSaved = (PathConfig)Resources.Load("PathConfig");
-
         ConfigurateObjects();
 
         _target.selectedIndex = EditorGUILayout.Popup("Path to create", _target.selectedIndex, pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
@@ -59,10 +66,12 @@ public class SeedEditor : Editor
     void OnSceneGUI()
     {
         Handles.BeginGUI();
-
+        
         var addValue = 30 / Vector3.Distance(Camera.current.transform.position, _target.transform.position);
 
-        RestartMap();
+        OpenSaveMapWindow();
+
+        NewMap();
 
         DeleteLastPath();
         DeleteLastVessel();
@@ -73,7 +82,23 @@ public class SeedEditor : Editor
         DrawButton("+", _target.transform.position - Camera.current.transform.right * addValue);        
 
         SaveMap();
+
         Handles.EndGUI();
+
+        //GizmosVesselsManager.DrawHandles();
+
+        //SceneView.onSceneGUIDelegate += DrawHandles();
+    }
+
+    public void OpenSaveMapWindow()
+    {
+        if (!_target.mapLoaded)
+        {
+            if (GUI.Button(new Rect(20, 140, buttonWidth, buttonHeight), "Save new Map"))
+            {
+                WindowSaveMaps.CreateWindow();
+            }
+        }
     }
 
     public void ConfigurateObjects()
@@ -105,22 +130,20 @@ public class SeedEditor : Editor
             GUILayout.Label(AssetDatabase.GetAssetPath(pathsSaved.objectsToInstantiate[_target.selectedIndex]));
             GUILayout.EndHorizontal();
         }
-    }
+    }    
 
-    
-
-    void RestartMap()
+    void NewMap()
     {
-        if (!restartMap && GUI.Button(new Rect(20, 20, buttonWidth, buttonHeight), "Restart Map"))
+        if (!newMap && GUI.Button(new Rect(20, 20, buttonWidth, buttonHeight), "New Map"))
         {                
-            restartMap = true;
+            newMap = true;
         }
 
-        if(restartMap && GUI.Button(new Rect(20, 20, buttonWidth, buttonHeight), "No"))
+        if(newMap && GUI.Button(new Rect(20, 20, buttonWidth, buttonHeight), "No"))
         {
-            restartMap = false;
+            newMap = false;
         }
-        if (restartMap && GUI.Button(new Rect(160, 20, buttonWidth, buttonHeight), "Yes"))
+        if (newMap && GUI.Button(new Rect(160, 20, buttonWidth, buttonHeight), "Yes"))
         {
             foreach (var item in pathsSaved.paths)
             {
@@ -143,7 +166,7 @@ public class SeedEditor : Editor
 
             _target.transform.position = new Vector3(0, 0, 0);
 
-            restartMap = false;
+            newMap = false;
             _target.mapLoaded = false;
         }
     }

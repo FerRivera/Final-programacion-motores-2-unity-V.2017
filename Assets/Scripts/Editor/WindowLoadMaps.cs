@@ -68,14 +68,14 @@ public class WindowLoadMaps : EditorWindow
             var currentMapName = tempPath.LastOrDefault().Split('.');
             //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
 
-            if(!string.IsNullOrEmpty(_searchMap))
-                if (currentMapName[0] != _searchMap)
-                    continue;
+            if (!string.IsNullOrEmpty(_searchMap) && !currentMapName[0].Contains(_searchMap))
+                continue;
 
-            EditorGUI.BeginDisabledGroup(true);
-            currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
-            EditorGUILayout.IntField("Total polygons:", AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons);
-            EditorGUI.EndDisabledGroup();
+            //EditorGUI.BeginDisabledGroup(true);
+            //currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
+            EditorGUILayout.LabelField("Map name: " + currentMapName[0]);
+            EditorGUILayout.LabelField("Total polygons: " + AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons);
+            //EditorGUI.EndDisabledGroup();
 
             if (!wantToDeleteList[i])
             {

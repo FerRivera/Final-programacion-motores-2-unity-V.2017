@@ -5,6 +5,7 @@ using UnityEditor;
 using UnityEngine;
 
 [CustomEditor(typeof(VesselsInstantiator))]
+[ExecuteInEditMode]
 public class VesselsInstantiatorEditor : Editor
 {
     //private VesselsInstantiator _target;
@@ -18,12 +19,29 @@ public class VesselsInstantiatorEditor : Editor
 
     PathConfig _pathsSaved;
 
+    static bool preInstantiateVessel;
+    static int preInstantiateVesselIndex;
+    static GameObject preInstantiateVesselGo = null;
+
     void OnEnable()
     {
         //_target = (VesselsInstantiator)target;
         _objects = Resources.LoadAll("Vessels", typeof(GameObject)).ToList();
         _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
+
+        if(_vesselsSaved == null)
+        {
+            ScriptableObjectsCreator.CreateVesselsConfig();
+            _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
+        }
+
         _pathsSaved = (PathConfig)Resources.Load("PathConfig");
+
+        if (_pathsSaved == null)
+        {
+            ScriptableObjectsCreator.CreatePathConfig();
+            _pathsSaved = (PathConfig)Resources.Load("PathConfig");
+        }
     }
 
     public override void OnInspectorGUI()
@@ -41,7 +59,12 @@ public class VesselsInstantiatorEditor : Editor
 
     private void ShowValues()
     {
+        if (_vesselsSaved.selectedIndex > _pathsSaved.vesselsToInstantiate.Count())
+            _vesselsSaved.selectedIndex = 0;
+
         _vesselsSaved.selectedIndex = EditorGUILayout.Popup("Vessel to create", _vesselsSaved.selectedIndex, _objects.Select(x => x.name).ToArray());
+
+        ShowPreview();
 
         _vesselsSaved.distance = EditorGUILayout.FloatField("Distance between vessels", _vesselsSaved.distance);
 
@@ -54,6 +77,7 @@ public class VesselsInstantiatorEditor : Editor
             if (GUILayout.Button("Disable Editing"))
             {
                 _editMode = false;
+                preInstantiateVessel = false;
             }
         }
         else
@@ -72,6 +96,8 @@ public class VesselsInstantiatorEditor : Editor
 
     private void OnSceneGUI()
     {
+        PreInstantiateVessel();
+
         if (_editMode)
         {
             if (Event.current.type == EventType.MouseDown)
@@ -86,6 +112,42 @@ public class VesselsInstantiatorEditor : Editor
 
                 Event.current.Use();
             }            
+        }
+    }
+
+    public void PreInstantiateVessel()
+    {
+        if (!_editMode)
+            DestroyImmediate(preInstantiateVesselGo);
+
+        if (preInstantiateVessel && _editMode && _vesselsSaved.selectedIndex != preInstantiateVesselIndex)
+        {
+            preInstantiateVessel = false;
+            preInstantiateVesselIndex = 0;
+            DestroyImmediate(preInstantiateVesselGo);
+        }            
+
+        if (_editMode && !preInstantiateVessel && preInstantiateVesselGo == null)
+        {
+            preInstantiateVessel = true;
+            preInstantiateVesselGo = (GameObject)Instantiate(_objects[_vesselsSaved.selectedIndex]);
+            preInstantiateVesselIndex = _vesselsSaved.selectedIndex;
+            DestroyImmediate(preInstantiateVesselGo.GetComponent<Collider>());
+        }        
+
+        if (preInstantiateVesselGo != null)
+        {
+            Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
+            RaycastHit hitInfo;
+
+            if (Physics.Raycast(worldRay, out hitInfo, float.MaxValue, _vesselsSaved.map))
+            {
+                float y = preInstantiateVesselGo.GetComponent<Renderer>().bounds.size.y / 2;
+                var dir = hitInfo.point;
+
+                Vector3 pos = new Vector3(dir.x, dir.y + y, dir.z);
+                preInstantiateVesselGo.transform.position = pos;
+            }                
         }
     }
 
@@ -169,5 +231,19 @@ public class VesselsInstantiatorEditor : Editor
         selected.value = EditorGUILayout.MaskField(label, selected.value, layerNames);
 
         return selected;
+    }
+
+    void ShowPreview()
+    {
+        var _preview = AssetPreview.GetAssetPreview(_pathsSaved.vesselsToInstantiate[_vesselsSaved.selectedIndex]);
+
+        if (_preview != null)
+        {
+            GUILayout.BeginHorizontal();
+            GUI.DrawTexture(GUILayoutUtility.GetRect(150, 150, 150, 150), _preview, ScaleMode.ScaleToFit);
+            GUILayout.Label(_pathsSaved.vesselsToInstantiate[_vesselsSaved.selectedIndex].name);
+            GUILayout.Label(AssetDatabase.GetAssetPath(_pathsSaved.vesselsToInstantiate[_vesselsSaved.selectedIndex]));
+            GUILayout.EndHorizontal();
+        }
     }
 }

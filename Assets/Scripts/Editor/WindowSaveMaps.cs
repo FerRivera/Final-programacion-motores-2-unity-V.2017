@@ -18,9 +18,9 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     public PathConfig pathsSaved;
     private string _fullPath;
     private Seed _seed;
-
-    [MenuItem("Level options/Save new map")] // La ubicación dentro del editor de Unity
-    static void CreateWindow() // Crea la ventana a mostrar
+    string noPathSelected = "No path selected";
+    
+    public static void CreateWindow() // Crea la ventana a mostrar
     {
         var window = ((WindowSaveMaps)GetWindow(typeof(WindowSaveMaps))); //Esta línea va a obtener la ventana o a crearla. Una vez que haga esto, va a mostrarla.
         window.titleContent = new GUIContent("Save new map");
@@ -33,6 +33,8 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
         pathsSaved = (PathConfig)Resources.Load("PathConfig");
 
         _seed = GameObject.FindGameObjectWithTag("Seed").GetComponent<Seed>();
+
+        _fullPath = noPathSelected;
 
         CalculatePolygons();
     }
@@ -68,10 +70,13 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
 
         _mapName = EditorGUILayout.TextField("Map name", _mapName);
 
-        EditorGUI.BeginDisabledGroup(true);
-        _fullPath = EditorGUILayout.TextField("Path Selected", _fullPath);
-        pathsSaved.totalPolygons = EditorGUILayout.IntField("Total polygons:", pathsSaved.totalPolygons);
-        EditorGUI.EndDisabledGroup();
+        //EditorGUI.BeginDisabledGroup(true);
+        //_fullPath = EditorGUILayout.TextField("Path Selected", _fullPath);
+        //pathsSaved.totalPolygons = EditorGUILayout.IntField("Total polygons:", pathsSaved.totalPolygons);
+
+        EditorGUILayout.LabelField("Path Selected: " + _fullPath);
+        EditorGUILayout.LabelField("Total polygons: " + pathsSaved.totalPolygons);
+        //EditorGUI.EndDisabledGroup();
 
         if (GUILayout.Button("Select folder"))
         {
@@ -86,70 +91,75 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
         if (GUILayout.Button("Save map"))
         {
             List<string> tempPath = new List<string>();
-
-            if (!String.IsNullOrEmpty(_mapName))
+            if (CheckPathSelected())
             {
-                if (!CheckIfNameExist(_mapName, _fullPath))
+                if (!String.IsNullOrEmpty(_mapName))
                 {
-                    if (pathsSaved.paths.Count > 0)
+                    if (!CheckIfNameExist(_mapName, _fullPath))
                     {
-                        ScriptableObjectUtility.CreateAsset<MapsSaved>(_path + "/" + _mapName);
-
-                        var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
-
-                        MapsSaved currentMap = null;
-
-                        for (int i = asset.Length - 1; i >= 0; i--)
+                        if (pathsSaved.paths.Count > 0)
                         {
-                            //obtengo todo el path
-                            string path = AssetDatabase.GUIDToAssetPath(asset[i]);
-                            //separo las diferentes carpetas por el carcater /
-                            tempPath = path.Split('/').ToList();
+                            ScriptableObjectUtility.CreateAsset<MapsSaved>(_path + "/" + _mapName);
 
-                            if (path == "Assets/" + _path + "/" +_mapName + ".asset")
+                            var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
+
+                            MapsSaved currentMap = null;
+
+                            for (int i = asset.Length - 1; i >= 0; i--)
                             {
-                                if (File.Exists(_fullPath + "/" + tempPath.Last()))
+                                //obtengo todo el path
+                                string path = AssetDatabase.GUIDToAssetPath(asset[i]);
+                                //separo las diferentes carpetas por el carcater /
+                                tempPath = path.Split('/').ToList();
+
+                                if (path == "Assets/" + _path + "/" + _mapName + ".asset")
                                 {
-                                   currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
-                                    _seed.mapNameLoaded = _mapName;
-                                    _seed.mapLoaded = true;
-                                    break;
+                                    if (File.Exists(_fullPath + "/" + tempPath.Last()))
+                                    {
+                                        currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
+                                        _seed.mapNameLoaded = _mapName;
+                                        _seed.mapLoaded = true;
+                                        break;
+                                    }
                                 }
+
+                                //obtengo la ultima parte, que seria el nombre con la extension y saco la extension
+                                //var currentMapName = tempPath.LastOrDefault().Split('.');
+                                //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
+                                //if (currentMapName[0] == _mapName)
+                                //{
+                                //    currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);                                
+                                //    _seed.mapNameLoaded = _mapName;
+                                //    _seed.mapLoaded = true;
+                                //    break;
+                                //}
                             }
 
-                            //obtengo la ultima parte, que seria el nombre con la extension y saco la extension
-                            //var currentMapName = tempPath.LastOrDefault().Split('.');
-                            //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
-                            //if (currentMapName[0] == _mapName)
-                            //{
-                            //    currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);                                
-                            //    _seed.mapNameLoaded = _mapName;
-                            //    _seed.mapLoaded = true;
-                            //    break;
-                            //}
-                        }
+                            if (currentMap != null)
+                            {
+                                currentMap.paths.AddRange(pathsSaved.paths);
+                                currentMap.objectType.AddRange(pathsSaved.objectType);
+                                currentMap.positions.AddRange(pathsSaved.positions);
+                                currentMap.rotations.AddRange(pathsSaved.rotations);
 
-                        if (currentMap != null)
-                        {
-                            currentMap.paths.AddRange(pathsSaved.paths);
-                            currentMap.objectType.AddRange(pathsSaved.objectType);
-                            currentMap.positions.AddRange(pathsSaved.positions);
-                            currentMap.rotations.AddRange(pathsSaved.rotations);
+                                currentMap.vessels.AddRange(pathsSaved.vessels);
+                                currentMap.VesselsType.AddRange(pathsSaved.vesselsType);
+                                currentMap.vesselsPositions.AddRange(pathsSaved.vesselsPositions);
 
-                            currentMap.vessels.AddRange(pathsSaved.vessels);
-                            currentMap.VesselsType.AddRange(pathsSaved.vesselsType);
-                            currentMap.vesselsPositions.AddRange(pathsSaved.vesselsPositions);
-
-                            currentMap.totalPolygons = pathsSaved.totalPolygons;
-                            //esto hace que cuando cierro unity y lo vuelvo a abrir no se pierda la info
-                            EditorUtility.SetDirty(currentMap);
+                                currentMap.totalPolygons = pathsSaved.totalPolygons;
+                                //esto hace que cuando cierro unity y lo vuelvo a abrir no se pierda la info
+                                EditorUtility.SetDirty(currentMap);
+                            }
                         }
                     }
                 }
             }
         }
 
-        if(String.IsNullOrEmpty(_mapName))
+        if(!CheckPathSelected())
+            EditorGUILayout.HelpBox("Select the folder where you wish to save the map!", MessageType.Warning);
+
+        if (String.IsNullOrEmpty(_mapName))
             EditorGUILayout.HelpBox("Name field is empty!", MessageType.Warning);
 
         if (pathsSaved.paths.Count <= 0)
@@ -157,6 +167,14 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
 
         if (CheckIfNameExist(_mapName, _fullPath))
             EditorGUILayout.HelpBox("That name is already in use!", MessageType.Warning);
+    }
+
+    public bool CheckPathSelected()
+    {
+        if (!String.IsNullOrEmpty(_fullPath) && _fullPath != noPathSelected)
+            return true;
+
+        return false;
     }
 
     public bool CheckIfNameExist(string fileName, string path)

@@ -9,13 +9,15 @@ public class VesselEditor : Editor
 {
     PathConfig _pathsSaved;
     Vessel _target;
+    VesselsSaved _vesselsSaved;
 
     void OnEnable()
     {
         _target = (Vessel)target;
         //_objects = Resources.LoadAll("Vessels", typeof(GameObject)).ToList();
-        //_vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
-        
+        _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
+        //SceneView.onSceneGUIDelegate += OnScene;
+        //OnScene(SceneView.currentDrawingSceneView);
     }
 
     public override void OnInspectorGUI()
@@ -32,6 +34,8 @@ public class VesselEditor : Editor
         _pathsSaved = (PathConfig)Resources.Load("PathConfig");
 
         //_seed = GameObject.FindGameObjectWithTag("Seed").GetComponent<Seed>();
+
+        _target.distanceBetweenVessels = _vesselsSaved.distance;
 
         _target.currentIndex = EditorGUILayout.Popup("Actual type", _target.currentIndex, _pathsSaved.vesselsToInstantiate.Select(x => x.name).ToArray());
 
@@ -84,12 +88,14 @@ public class VesselEditor : Editor
 
     void OnSceneGUI()
     {
-        Handles.BeginGUI();
+        //DrawHandles(_target,GizmoType.NotInSelectionHierarchy);
+
+        Handles.BeginGUI();        
 
         DeleteActualVessel();
 
         Handles.EndGUI();
-    }
+    }   
 
     void DeleteActualVessel()
     {
@@ -120,4 +126,5 @@ public class VesselEditor : Editor
     {
 
     }
+        
 }
