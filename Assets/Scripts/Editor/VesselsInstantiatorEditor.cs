@@ -98,6 +98,9 @@ public class VesselsInstantiatorEditor : Editor
     {
         PreInstantiateVessel();
 
+        if(preInstantiateVesselGo != null)
+            Handles.RadiusHandle(preInstantiateVesselGo.transform.rotation, preInstantiateVesselGo.transform.position, _vesselsSaved.distance);        
+
         if (_editMode)
         {
             if (Event.current.type == EventType.MouseDown)
@@ -130,7 +133,7 @@ public class VesselsInstantiatorEditor : Editor
         if (_editMode && !preInstantiateVessel && preInstantiateVesselGo == null)
         {
             preInstantiateVessel = true;
-            preInstantiateVesselGo = (GameObject)Instantiate(_objects[_vesselsSaved.selectedIndex]);
+            preInstantiateVesselGo = (GameObject)Instantiate(_objects[_vesselsSaved.selectedIndex]);            
             preInstantiateVesselIndex = _vesselsSaved.selectedIndex;
             DestroyImmediate(preInstantiateVesselGo.GetComponent<Collider>());
         }        
@@ -158,38 +161,51 @@ public class VesselsInstantiatorEditor : Editor
             //var dir = MousePosHit.point + (Camera.main.transform.position - MousePosHit.point).normalized;
             var dir = MousePosHit.point;
 
-            if (!CloserVessels(dir, _vesselsSaved.distance))
+            GameObject vessel = (GameObject)Instantiate(_objects[_vesselsSaved.selectedIndex]);
+
+            if (vessel.GetComponent<Vessel>() == null)
             {
-                GameObject vessel = (GameObject)Instantiate(_objects[_vesselsSaved.selectedIndex]);
+                vessel.AddComponent<Vessel>().lastIndex = _vesselsSaved.selectedIndex;
+                var temp = vessel.GetComponent<Vessel>();
+                temp.currentIndex = _vesselsSaved.selectedIndex;
+                temp.id = _pathsSaved.vessels.Count;
+                temp.distanceBetweenVessels = _vesselsSaved.distance;
 
-                if (vessel.GetComponent<Vessel>() == null)
-                {
-                    vessel.AddComponent<Vessel>().lastIndex = _vesselsSaved.selectedIndex;
-                    var temp = vessel.GetComponent<Vessel>();
-                    temp.currentIndex = _vesselsSaved.selectedIndex;
-                    temp.id = _pathsSaved.vessels.Count;
-                }
+                if (_pathsSaved.maxVesselDistance < _vesselsSaved.distance)
+                    _pathsSaved.maxVesselDistance = _vesselsSaved.distance;                
+            }            
 
-                float y = vessel.GetComponent<Renderer>().bounds.size.y/2;
+            float y = vessel.GetComponent<Renderer>().bounds.size.y / 2;
 
-                Vector3 pos = new Vector3(dir.x, dir.y+y , dir.z);
-                vessel.transform.position = pos;
+            Vector3 pos = new Vector3(dir.x, dir.y + y, dir.z);
+            vessel.transform.position = pos;
 
+            CheckCloserVessels(vessel.transform.position,vessel);
+
+            if(vessel != null)
+            {
                 _pathsSaved.vessels.Add(vessel);
                 _pathsSaved.vesselsPositions.Add(vessel.transform.position);
                 _pathsSaved.vesselsType.Add(_vesselsSaved.selectedIndex);
+                _pathsSaved.vesselsDistance.Add(_vesselsSaved.distance);
             }
         }
     }
 
-    bool CloserVessels(Vector3 position, float radius)
+    void CheckCloserVessels(Vector3 position,GameObject go)
     {
-        var temp = Physics.OverlapSphere(position, radius, _vesselsSaved.vessels);
+        var temp = Physics.OverlapSphere(position, _pathsSaved.maxVesselDistance, _vesselsSaved.vessels).ToList();
 
-        if (temp.Count() > 0)
-            return true;
+        temp.Remove(go.GetComponent<Collider>());
 
-        return false;
+        foreach (var item in temp)
+        {
+            float distance = item.gameObject.GetComponent<Vessel>().distanceBetweenVessels;
+            var vessels = Physics.OverlapSphere(item.transform.position, distance, _vesselsSaved.vessels).ToList();
+
+            if(go != null && vessels.Contains(go.GetComponent<Collider>()))
+                DestroyImmediate(go); 
+        }
     }
 
     public LayerMask LayerMaskField(string label, LayerMask selected)

@@ -20,7 +20,7 @@ public class WindowLoadMaps : EditorWindow
         var window = ((WindowLoadMaps)GetWindow(typeof(WindowLoadMaps)));
         window.titleContent = new GUIContent("Load map");
         window.Show();
-        window.Init();        
+        window.Init();
     }
 
     public void Init()
@@ -75,6 +75,7 @@ public class WindowLoadMaps : EditorWindow
             //currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
             EditorGUILayout.LabelField("Map name: " + currentMapName[0]);
             EditorGUILayout.LabelField("Total polygons: " + AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons);
+            EditorGUILayout.LabelField("Path: " + path);
             //EditorGUI.EndDisabledGroup();
 
             if (!wantToDeleteList[i])
@@ -134,6 +135,7 @@ public class WindowLoadMaps : EditorWindow
         pathsSaved.vessels.Clear();
         pathsSaved.vesselsType.Clear();
         pathsSaved.vesselsPositions.Clear();
+        pathsSaved.vesselsDistance.Clear();
 
         int count = map.paths.Count;
 
@@ -163,10 +165,12 @@ public class WindowLoadMaps : EditorWindow
             vessel.AddComponent<Vessel>().currentIndex = map.VesselsType[i];
             vessel.GetComponent<Vessel>().lastIndex = map.VesselsType[i];
             vessel.GetComponent<Vessel>().id = i;
+            vessel.GetComponent<Vessel>().distanceBetweenVessels = map.vesselsDistance[i];
 
             pathsSaved.vessels.Add(vessel);
             pathsSaved.vesselsType.Add(map.VesselsType[i]);
             pathsSaved.vesselsPositions.Add(vessel.transform.position);
+            pathsSaved.vesselsDistance.Add(vessel.GetComponent<Vessel>().distanceBetweenVessels);
         }
 
         _seed.mapLoaded = true;

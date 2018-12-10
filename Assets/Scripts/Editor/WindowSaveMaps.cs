@@ -119,6 +119,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                                         currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
                                         _seed.mapNameLoaded = _mapName;
                                         _seed.mapLoaded = true;
+                                        _seed.currentMap = currentMap;
                                         break;
                                     }
                                 }
@@ -145,6 +146,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                                 currentMap.vessels.AddRange(pathsSaved.vessels);
                                 currentMap.VesselsType.AddRange(pathsSaved.vesselsType);
                                 currentMap.vesselsPositions.AddRange(pathsSaved.vesselsPositions);
+                                currentMap.vesselsDistance.AddRange(pathsSaved.vesselsDistance);
 
                                 currentMap.totalPolygons = pathsSaved.totalPolygons;
                                 //esto hace que cuando cierro unity y lo vuelvo a abrir no se pierda la info
@@ -201,33 +203,6 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
 
         return false;
     }
-
-    //public bool CheckIfNameExist(string fileName, string path)
-    //{
-    //    List<string> tempPath = new List<string>();
-
-    //    var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
-
-    //    for (int i = asset.Length - 1; i >= 0; i--)
-    //    {
-    //        //obtengo todo el path
-    //        string assetPath = AssetDatabase.GUIDToAssetPath(asset[i]);
-
-    //        //separo las diferentes carpetas por el caracter /
-    //        tempPath = assetPath.Split('/').ToList();            
-
-    //        //obtengo la ultima parte, que seria el nombre con la extension y saco la extension
-    //        var currentMapName = tempPath.LastOrDefault().Split('.');
-
-    //        //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
-    //        if (currentMapName[0] == fileName)
-    //        {                
-    //            return true;                
-    //        }
-    //    }
-
-    //    return false;
-    //}
 
     void OnGUI() // Todo lo que se muestra en la ventana
     {

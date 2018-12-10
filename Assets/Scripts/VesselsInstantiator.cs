@@ -7,4 +7,5 @@ public class VesselsInstantiator : MonoBehaviour
     public int lastIndex;
     public int currentIndex;
     public int selectedIndex;
+    public float maxDistanceValue; 
 }

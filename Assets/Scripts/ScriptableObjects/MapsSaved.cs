@@ -12,4 +12,5 @@ public class MapsSaved : ScriptableObject
     public List<Vector3> vesselsPositions = new List<Vector3>();
     public List<int> VesselsType = new List<int>();
     public int totalPolygons;
+    public List<float> vesselsDistance = new List<float>();
 }

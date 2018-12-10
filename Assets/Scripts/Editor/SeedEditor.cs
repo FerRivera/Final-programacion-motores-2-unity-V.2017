@@ -33,7 +33,6 @@ public class SeedEditor : Editor
             ScriptableObjectsCreator.CreatePathConfig();
             pathsSaved = (PathConfig)Resources.Load("PathConfig");
         }
-        //SceneView.onSceneGUIDelegate += OnScene;
     }
 
     public override void OnInspectorGUI()
@@ -84,10 +83,6 @@ public class SeedEditor : Editor
         SaveMap();
 
         Handles.EndGUI();
-
-        //GizmosVesselsManager.DrawHandles();
-
-        //SceneView.onSceneGUIDelegate += DrawHandles();
     }
 
     public void OpenSaveMapWindow()
@@ -163,6 +158,10 @@ public class SeedEditor : Editor
             pathsSaved.vessels.Clear();
             pathsSaved.vesselsPositions.Clear();
             pathsSaved.vesselsType.Clear();
+            pathsSaved.vesselsDistance.Clear();
+
+            pathsSaved.maxVesselDistance = 0;
+            pathsSaved.totalPolygons = 0;
 
             _target.transform.position = new Vector3(0, 0, 0);
 
@@ -207,6 +206,7 @@ public class SeedEditor : Editor
                 pathsSaved.vesselsType.RemoveAt(pathsSaved.vessels.Count - 1);
                 pathsSaved.vesselsPositions.RemoveAt(pathsSaved.vessels.Count - 1);
                 pathsSaved.vessels.Remove(lastObject);
+                pathsSaved.vesselsDistance.Remove(pathsSaved.vesselsDistance.Count - 1);
 
                 DestroyImmediate(lastObject);
             }            
@@ -303,50 +303,67 @@ public class SeedEditor : Editor
             }
             if (saveMap && GUI.Button(new Rect(160, 140, buttonWidth, buttonHeight), "Yes"))
             {
-                List<string> tempPath = new List<string>();
+                //List<string> tempPath = new List<string>();
 
-                var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
+                //var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
 
-                MapsSaved currentMap = null;
+                //MapsSaved _targetcurrentMap = null;
 
-                for (int i = asset.Length - 1; i >= 0; i--)
+                //for (int i = asset.Length - 1; i >= 0; i--)
+                //{
+                    //string path = AssetDatabase.GUIDToAssetPath(asset[i]);
+                    ////separo las diferentes carpetas por el carcater /
+                    //tempPath = path.Split('/').ToList();
+
+                    //if (path == "Assets/" + _path + "/" + _mapName + ".asset")
+                    //{
+                    //    if (File.Exists(_fullPath + "/" + tempPath.Last()))
+                    //    {
+                    //        currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
+                    //        _seed.mapNameLoaded = _mapName;
+                    //        _seed.mapLoaded = true;
+                    //        break;
+                    //    }
+                    //}
+
+                    ////obtengo todo el path
+                    //string path = AssetDatabase.GUIDToAssetPath(asset[i]);
+                    ////separo las diferentes carpetas por el carcater /
+                    //tempPath = path.Split('/').ToList();
+                    ////obtengo la ultima parte, que seria el nombre con la extension y saco la extension
+                    //var currentMapName = tempPath.LastOrDefault().Split('.');
+                    ////si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
+                    //if (currentMapName[0] == _target.mapNameLoaded)
+                    //{
+                    //    currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
+                    //    break;
+                    //}
+                //}
+
+                if (_target.currentMap != null)
                 {
-                    //obtengo todo el path
-                    string path = AssetDatabase.GUIDToAssetPath(asset[i]);
-                    //separo las diferentes carpetas por el carcater /
-                    tempPath = path.Split('/').ToList();
-                    //obtengo la ultima parte, que seria el nombre con la extension y saco la extension
-                    var currentMapName = tempPath.LastOrDefault().Split('.');
-                    //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
-                    if (currentMapName[0] == _target.mapNameLoaded)
-                    {
-                        currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
-                        break;
-                    }
-                }
+                    _target.currentMap.paths.Clear();
+                    _target.currentMap.objectType.Clear();
+                    _target.currentMap.positions.Clear();
+                    _target.currentMap.rotations.Clear();
 
-                if (currentMap != null)
-                {
-                    currentMap.paths.Clear();
-                    currentMap.objectType.Clear();
-                    currentMap.positions.Clear();
-                    currentMap.rotations.Clear();
+                    _target.currentMap.vessels.Clear();
+                    _target.currentMap.VesselsType.Clear();
+                    _target.currentMap.vesselsPositions.Clear();
+                    _target.currentMap.vesselsDistance.Clear();
 
-                    currentMap.vessels.Clear();
-                    currentMap.VesselsType.Clear();
-                    currentMap.vesselsPositions.Clear();
+                    _target.currentMap.paths.AddRange(pathsSaved.paths);
+                    _target.currentMap.objectType.AddRange(pathsSaved.objectType);
+                    _target.currentMap.positions.AddRange(pathsSaved.positions);
+                    _target.currentMap.rotations.AddRange(pathsSaved.rotations);
 
-                    currentMap.paths.AddRange(pathsSaved.paths);
-                    currentMap.objectType.AddRange(pathsSaved.objectType);
-                    currentMap.positions.AddRange(pathsSaved.positions);
-                    currentMap.rotations.AddRange(pathsSaved.rotations);
-
-                    currentMap.vessels.AddRange(pathsSaved.vessels);
-                    currentMap.VesselsType.AddRange(pathsSaved.vesselsType);
-                    currentMap.vesselsPositions.AddRange(pathsSaved.vesselsPositions);
+                    _target.currentMap.vessels.AddRange(pathsSaved.vessels);
+                    _target.currentMap.VesselsType.AddRange(pathsSaved.vesselsType);
+                    _target.currentMap.vesselsPositions.AddRange(pathsSaved.vesselsPositions);
+                    _target.currentMap.vesselsDistance.AddRange(pathsSaved.vesselsDistance);
 
                     //esto hace que cuando cierro unity y lo vuelvo a abrir no se pierda la info
-                    EditorUtility.SetDirty(currentMap);
+                    EditorUtility.SetDirty(_target.currentMap);
                     saveMap = false;
                 }
             }

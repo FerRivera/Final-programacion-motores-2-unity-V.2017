@@ -14,10 +14,14 @@ public class VesselEditor : Editor
     void OnEnable()
     {
         _target = (Vessel)target;
-        //_objects = Resources.LoadAll("Vessels", typeof(GameObject)).ToList();
+
         _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
-        //SceneView.onSceneGUIDelegate += OnScene;
-        //OnScene(SceneView.currentDrawingSceneView);
+
+        if (_vesselsSaved == null)
+        {
+            ScriptableObjectsCreator.CreateVesselsConfig();
+            _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
+        }
     }
 
     public override void OnInspectorGUI()
@@ -31,16 +35,13 @@ public class VesselEditor : Editor
 
     private void ShowValues()
     {
-        _pathsSaved = (PathConfig)Resources.Load("PathConfig");
-
-        //_seed = GameObject.FindGameObjectWithTag("Seed").GetComponent<Seed>();
-
-        _target.distanceBetweenVessels = _vesselsSaved.distance;
+        _pathsSaved = (PathConfig)Resources.Load("PathConfig");        
 
         _target.currentIndex = EditorGUILayout.Popup("Actual type", _target.currentIndex, _pathsSaved.vesselsToInstantiate.Select(x => x.name).ToArray());
 
-        ShowPreview();
-        _target.id = EditorGUILayout.IntField("ID", _target.id);
+        ShowPreview();        
+
+        //_target.id = EditorGUILayout.IntField("ID", _target.id);
 
         SwitchType();
     }
@@ -69,18 +70,16 @@ public class VesselEditor : Editor
             vessel.AddComponent<Vessel>().currentIndex = _target.currentIndex;
             vessel.GetComponent<Vessel>().lastIndex = _target.currentIndex;
             vessel.GetComponent<Vessel>().id = _target.id;
+            vessel.GetComponent<Vessel>().distanceBetweenVessels = _target.distanceBetweenVessels;
 
             var temp = _pathsSaved.vessels[_target.id];
 
             _pathsSaved.vessels[_target.id] = vessel;
             _pathsSaved.vesselsType[_target.id] = vessel.GetComponent<Vessel>().currentIndex;
             _pathsSaved.vesselsPositions[_target.id] = vessel.transform.position;
+            _pathsSaved.vesselsDistance[_target.id] = vessel.GetComponent<Vessel>().distanceBetweenVessels;
 
             DestroyImmediate(temp);
-
-            //_pathsSaved.vessels.Insert(_target.id, vessel);
-            //_pathsSaved.vesselsType.Insert(_target.id, vessel.GetComponent<Vessel>().currentIndex);
-            //_pathsSaved.vesselsPositions.Insert(_target.id, vessel.transform.position);
 
             Selection.activeObject = vessel;
         }
@@ -88,18 +87,31 @@ public class VesselEditor : Editor
 
     void OnSceneGUI()
     {
-        //DrawHandles(_target,GizmoType.NotInSelectionHierarchy);
+        Handles.BeginGUI();
 
-        Handles.BeginGUI();        
+        _target.distanceBetweenVessels = EditorGUILayout.FloatField("Distance between vessels: ", _target.distanceBetweenVessels, GUILayout.Width(300));
+
+        ChangeDistance();
 
         DeleteActualVessel();
 
         Handles.EndGUI();
-    }   
+    }
+
+    public void ChangeDistance()
+    {
+        if (_target != null && _pathsSaved != null && _pathsSaved.maxVesselDistance < _target.distanceBetweenVessels)
+        {
+            _pathsSaved.maxVesselDistance = _target.distanceBetweenVessels;            
+        }
+         
+        if(_target != null && _pathsSaved && _pathsSaved.vesselsDistance[_target.id] != _target.distanceBetweenVessels)
+            _pathsSaved.vesselsDistance[_target.id] = _target.distanceBetweenVessels;
+    }
 
     void DeleteActualVessel()
     {
-        if (GUI.Button(new Rect(20, 20, 130, 30), "Delete vessel"))
+        if (GUI.Button(new Rect(20, 50, 130, 30), "Delete vessel"))
         {
             var temp = _pathsSaved.vessels[_target.id];
             var tempID = temp.GetComponent<Vessel>().id;
@@ -107,11 +119,7 @@ public class VesselEditor : Editor
             _pathsSaved.vessels.RemoveAt(tempID);
             _pathsSaved.vesselsType.RemoveAt(tempID);
             _pathsSaved.vesselsPositions.RemoveAt(tempID);
-
-            //pathsSaved.paths.Remove(temp);
-            //pathsSaved.objectType.Remove(pathsSaved.objectType[tempID]);
-            //pathsSaved.positions.Remove(pathsSaved.positions[tempID]);
-            //pathsSaved.rotations.Remove(pathsSaved.rotations[tempID]);
+            _pathsSaved.vesselsDistance.RemoveAt(tempID);
 
             for (int i = _pathsSaved.vessels.Count - 1; i >= _target.id; i--)
             {

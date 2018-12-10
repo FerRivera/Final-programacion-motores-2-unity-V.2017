@@ -9,4 +9,5 @@ public class Seed : MonoBehaviour
     public List<Object> vesselsToInstantiate;
     public bool mapLoaded;
     public string mapNameLoaded;
+    public MapsSaved currentMap;
 }
