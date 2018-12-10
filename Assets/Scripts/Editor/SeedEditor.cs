@@ -362,10 +362,37 @@ public class SeedEditor : Editor
                     _target.currentMap.vesselsPositions.AddRange(pathsSaved.vesselsPositions);
                     _target.currentMap.vesselsDistance.AddRange(pathsSaved.vesselsDistance);
 
+                    CalculatePolygons();
+
+                    _target.currentMap.totalPolygons = pathsSaved.totalPolygons;
                     //esto hace que cuando cierro unity y lo vuelvo a abrir no se pierda la info
                     EditorUtility.SetDirty(_target.currentMap);
                     saveMap = false;
                 }
+            }
+        }
+    }
+
+    void CalculatePolygons()
+    {
+        if (pathsSaved == null)
+            return;
+
+        pathsSaved.totalPolygons = 0;
+
+        foreach (var item in pathsSaved.paths)
+        {
+            if (item.GetComponent<MeshFilter>() != null)
+            {
+                pathsSaved.totalPolygons += item.GetComponent<MeshFilter>().sharedMesh.triangles.Length / 3;
+            }
+        }
+
+        foreach (var item in pathsSaved.vessels)
+        {
+            if (item.GetComponent<MeshFilter>() != null)
+            {
+                pathsSaved.totalPolygons += item.GetComponent<MeshFilter>().sharedMesh.triangles.Length / 3;
             }
         }
     }
