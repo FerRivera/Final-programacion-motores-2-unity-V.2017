@@ -7,11 +7,14 @@ using UnityEngine;
 public class GizmosVesselsManagerEditor : Editor
 {
     PathConfig _pathsSaved;
-    VesselsSaved _vesselsSaved;
+    static VesselsSaved _vesselsSaved;
 
     [DrawGizmo(GizmoType.InSelectionHierarchy | GizmoType.NotInSelectionHierarchy)]
     static void DrawHandles(Vessel item, GizmoType gizmoType)
     {
+        if (_vesselsSaved != null && !_vesselsSaved.showVesselsLimits)
+            return;
+
         Handles.RadiusHandle(item.transform.rotation, item.transform.position, item.distanceBetweenVessels);
     }
 
@@ -41,10 +44,18 @@ public class GizmosVesselsManagerEditor : Editor
 
     public void DrawHandlde()
     {
+        if (!_vesselsSaved.showVesselsLimits)
+            return;
+
         foreach (var item in _pathsSaved.vessels)
         {
             if(item != null)
                 Handles.RadiusHandle(item.transform.rotation, item.transform.position, item.GetComponent<Vessel>().distanceBetweenVessels);
         }
+    }
+
+    public override void OnInspectorGUI()
+    {
+        _vesselsSaved.showVesselsLimits = EditorGUILayout.Toggle("Show vessels limits ", _vesselsSaved.showVesselsLimits);
     }
 }

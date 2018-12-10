@@ -66,11 +66,25 @@ public class VesselsInstantiatorEditor : Editor
 
         ShowPreview();
 
+        _vesselsSaved.showHelpBox = EditorGUILayout.Toggle("Show Helpbox", _vesselsSaved.showHelpBox);
+
         _vesselsSaved.distance = EditorGUILayout.FloatField("Distance between vessels", _vesselsSaved.distance);
+
+        if (_vesselsSaved.distance < 0)
+            _vesselsSaved.distance = 0;        
+
+        if (_vesselsSaved.showHelpBox)
+            EditorGUILayout.HelpBox("This value is the minimium distance that can be between vessels", MessageType.Info);
 
         _vesselsSaved.vessels = LayerMaskField("Vessels layer", _vesselsSaved.vessels.value);
 
+        if (_vesselsSaved.showHelpBox)
+            EditorGUILayout.HelpBox("Layer used to calculate vessels distance", MessageType.Info);
+
         _vesselsSaved.map = LayerMaskField("Map layer", _vesselsSaved.map.value);
+
+        if (_vesselsSaved.showHelpBox)
+            EditorGUILayout.HelpBox("Layer used to place vessels", MessageType.Info);
 
         if (_editMode)
         {

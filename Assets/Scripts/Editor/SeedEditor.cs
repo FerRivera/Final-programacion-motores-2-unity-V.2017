@@ -290,6 +290,9 @@ public class SeedEditor : Editor
 
     public void SaveMap()
     {
+        if (_target.currentMap == null)
+            _target.mapLoaded = false;
+
         if (_target.mapLoaded)
         {
             if (!saveMap && GUI.Button(new Rect(20, 140, buttonWidth, buttonHeight), "Save Map"))
