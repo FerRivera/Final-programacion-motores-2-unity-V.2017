@@ -33,8 +33,10 @@ public class GizmosVesselsManagerEditor : Editor
         if (_vesselsSaved == null)
         {
             ScriptableObjectsCreator.CreateVesselsConfig();
-            _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
+            _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");            
         }
+
+        EditorUtility.SetDirty(_vesselsSaved);
     }
 
     private void OnSceneGUI()

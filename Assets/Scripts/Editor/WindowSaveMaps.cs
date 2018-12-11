@@ -29,7 +29,10 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     }
 
     public void Init()
-    {    
+    {
+        maxSize = new Vector2(501, 525);
+        minSize = new Vector2(500, 524);
+
         pathsSaved = (PathConfig)Resources.Load("PathConfig");
 
         _seed = GameObject.FindGameObjectWithTag("Seed").GetComponent<Seed>();

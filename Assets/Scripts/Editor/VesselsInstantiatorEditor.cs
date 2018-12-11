@@ -32,8 +32,10 @@ public class VesselsInstantiatorEditor : Editor
         if(_vesselsSaved == null)
         {
             ScriptableObjectsCreator.CreateVesselsConfig();
-            _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
+            _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");            
         }
+
+        EditorUtility.SetDirty(_vesselsSaved);
 
         _pathsSaved = (PathConfig)Resources.Load("PathConfig");
 
@@ -42,6 +44,14 @@ public class VesselsInstantiatorEditor : Editor
             ScriptableObjectsCreator.CreatePathConfig();
             _pathsSaved = (PathConfig)Resources.Load("PathConfig");
         }
+    }
+
+    private void OnDisable()
+    {
+        _editMode = false;
+        preInstantiateVessel = false;
+        preInstantiateVesselIndex = 0;
+        DestroyImmediate(preInstantiateVesselGo);
     }
 
     public override void OnInspectorGUI()

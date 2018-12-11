@@ -17,19 +17,22 @@ public class WindowLoadMaps : EditorWindow
     [MenuItem("Level options/Load map")]
     static void CreateWindow()
     {
-        var window = ((WindowLoadMaps)GetWindow(typeof(WindowLoadMaps)));
-        window.titleContent = new GUIContent("Load map");
+        var window = ((WindowLoadMaps)GetWindow(typeof(WindowLoadMaps),false, "Load map"));
+        //window.titleContent = new GUIContent("Load map");
         window.Show();
-        window.Init();
+        window.Init();        
     }
 
     public void Init()
     {
+        maxSize = new Vector2(501, 525);
+        minSize = new Vector2(500, 524);
+
         _seed = GameObject.FindGameObjectWithTag("Seed").GetComponent<Seed>();
 
         pathsSaved = (PathConfig)Resources.Load("PathConfig");
 
-        maxSize = new Vector2(maxXSize, maxYSize);
+        //maxSize = new Vector2(maxXSize, maxYSize);
 
         var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
 
@@ -68,7 +71,7 @@ public class WindowLoadMaps : EditorWindow
             var currentMapName = tempPath.LastOrDefault().Split('.');
             //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
 
-            if (!string.IsNullOrEmpty(_searchMap) && !currentMapName[0].Contains(_searchMap))
+            if (!string.IsNullOrEmpty(_searchMap) && !currentMapName[0].ToLower().Contains(_searchMap.ToLower()))
                 continue;
 
             //EditorGUI.BeginDisabledGroup(true);
