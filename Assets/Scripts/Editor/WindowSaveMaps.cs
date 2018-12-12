@@ -209,7 +209,9 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
 
     void OnGUI() // Todo lo que se muestra en la ventana
     {
-        SaveMap();        
+        SaveMap();
+
+        EditorGUILayout.HelpBox("After saving the new map, you can overwrite the changes by clicking on the \"Overwrite map\" button on the scene", MessageType.Info);
     }
 
     private void OnFocus()

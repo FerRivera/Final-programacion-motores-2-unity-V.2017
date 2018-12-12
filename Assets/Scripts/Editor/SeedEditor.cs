@@ -295,7 +295,7 @@ public class SeedEditor : Editor
 
         if (_target.mapLoaded)
         {
-            if (!saveMap && GUI.Button(new Rect(20, 140, buttonWidth, buttonHeight), "Save Map"))
+            if (!saveMap && GUI.Button(new Rect(20, 140, buttonWidth, buttonHeight), "Overwrite Map"))
             {
                 saveMap = true;
             }
