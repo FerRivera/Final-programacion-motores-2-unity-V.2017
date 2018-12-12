@@ -98,10 +98,14 @@ public class WindowLoadMaps : EditorWindow
                 {
                     AssetDatabase.DeleteAsset(path);
 
-                    if(currentMapName[0] == _seed.mapNameLoaded)
+                    if(_seed.currentMap == currentMap)
                     {
                         _seed.mapLoaded = false;
                     }
+                    //if(currentMapName[0] == _seed.mapNameLoaded)
+                    //{
+                        
+                    //}
                 }
             }
 
@@ -109,6 +113,7 @@ public class WindowLoadMaps : EditorWindow
             {
                 _seed.mapNameLoaded = currentMapName[0];
                 currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
+                _seed.currentMap = currentMap;
                 LoadMapOnScene(currentMap);
             }
 

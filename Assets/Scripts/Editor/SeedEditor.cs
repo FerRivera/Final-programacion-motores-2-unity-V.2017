@@ -87,13 +87,13 @@ public class SeedEditor : Editor
 
     public void OpenSaveMapWindow()
     {
-        if (!_target.mapLoaded)
-        {
+        //if (!_target.mapLoaded)
+        //{
             if (GUI.Button(new Rect(20, 140, buttonWidth, buttonHeight), "Save new Map"))
             {
                 WindowSaveMaps.CreateWindow();
             }
-        }
+        //}
     }
 
     public void ConfigurateObjects()
@@ -295,16 +295,16 @@ public class SeedEditor : Editor
 
         if (_target.mapLoaded)
         {
-            if (!saveMap && GUI.Button(new Rect(20, 140, buttonWidth, buttonHeight), "Overwrite Map"))
+            if (!saveMap && GUI.Button(new Rect(20, 180, buttonWidth, buttonHeight), "Overwrite Map"))
             {
                 saveMap = true;
             }
 
-            if (saveMap && GUI.Button(new Rect(20, 140, buttonWidth, buttonHeight), "No"))
+            if (saveMap && GUI.Button(new Rect(20, 180, buttonWidth, buttonHeight), "No"))
             {
                 saveMap = false;
             }
-            if (saveMap && GUI.Button(new Rect(160, 140, buttonWidth, buttonHeight), "Yes"))
+            if (saveMap && GUI.Button(new Rect(160, 180, buttonWidth, buttonHeight), "Yes"))
             {
                 //List<string> tempPath = new List<string>();
 
