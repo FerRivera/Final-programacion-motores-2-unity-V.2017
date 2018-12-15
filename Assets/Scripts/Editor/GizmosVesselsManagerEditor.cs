@@ -15,6 +15,8 @@ public class GizmosVesselsManagerEditor : Editor
         if (_vesselsSaved != null && !_vesselsSaved.showVesselsLimits)
             return;
 
+        Handles.color = Color.black;
+
         Handles.RadiusHandle(item.transform.rotation, item.transform.position, item.distanceBetweenVessels);
     }
 
@@ -48,6 +50,8 @@ public class GizmosVesselsManagerEditor : Editor
     {
         if (!_vesselsSaved.showVesselsLimits)
             return;
+
+        Handles.color = Color.black;
 
         foreach (var item in _pathsSaved.vessels)
         {

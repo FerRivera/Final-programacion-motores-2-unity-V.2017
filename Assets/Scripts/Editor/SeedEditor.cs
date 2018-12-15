@@ -14,8 +14,13 @@ public class SeedEditor : Editor
     public float buttonWidth = 130;
     public float buttonHeight = 30;
 
-    int _buttonMinSize = 45;
-    int _buttonMaxSize = 70;
+    //int _buttonMinSize = 45;
+    //int _buttonMaxSize = 70;
+    int _newMapYPos = 20;
+    int _saveNewMapYPos = 60;
+    int _deleteLastPathYPos = 140;
+    int _deleteLastVesselYPos = 180;
+    int _overwriteMapYPos = 100;
 
     public PathConfig pathsSaved;
 
@@ -68,19 +73,22 @@ public class SeedEditor : Editor
         
         var addValue = 30 / Vector3.Distance(Camera.current.transform.position, _target.transform.position);
 
-        OpenSaveMapWindow();
+        if (!VesselsInstantiatorEditor.editMode)
+        {
+            OpenSaveMapWindow();
 
-        NewMap();
+            NewMap();
 
-        DeleteLastPath();
-        DeleteLastVessel();
-        
-        DrawButton("+", _target.transform.position + Camera.current.transform.up * addValue);
-        DrawButton("+", _target.transform.position - Camera.current.transform.up * addValue);
-        DrawButton("+", _target.transform.position + Camera.current.transform.right * addValue);
-        DrawButton("+", _target.transform.position - Camera.current.transform.right * addValue);        
+            DeleteLastPath();
+            DeleteLastVessel();
 
-        SaveMap();
+            DrawButton("+", _target.transform.position + Camera.current.transform.up * addValue);
+            DrawButton("+", _target.transform.position - Camera.current.transform.up * addValue);
+            DrawButton("+", _target.transform.position + Camera.current.transform.right * addValue);
+            DrawButton("+", _target.transform.position - Camera.current.transform.right * addValue);
+
+            SaveMap();
+        }       
 
         Handles.EndGUI();
     }
@@ -89,7 +97,7 @@ public class SeedEditor : Editor
     {
         //if (!_target.mapLoaded)
         //{
-            if (GUI.Button(new Rect(20, 140, buttonWidth, buttonHeight), "Save new Map"))
+            if (GUI.Button(new Rect(20, _saveNewMapYPos, buttonWidth, buttonHeight), "Save new Map"))
             {
                 WindowSaveMaps.CreateWindow();
             }
@@ -129,16 +137,16 @@ public class SeedEditor : Editor
 
     void NewMap()
     {
-        if (!newMap && GUI.Button(new Rect(20, 20, buttonWidth, buttonHeight), "New Map"))
+        if (!newMap && GUI.Button(new Rect(20, _newMapYPos, buttonWidth, buttonHeight), "New Map"))
         {                
             newMap = true;
         }
 
-        if(newMap && GUI.Button(new Rect(20, 20, buttonWidth, buttonHeight), "No"))
+        if(newMap && GUI.Button(new Rect(20, _newMapYPos, buttonWidth, buttonHeight), "No"))
         {
             newMap = false;
         }
-        if (newMap && GUI.Button(new Rect(160, 20, buttonWidth, buttonHeight), "Yes"))
+        if (newMap && GUI.Button(new Rect(160, _newMapYPos, buttonWidth, buttonHeight), "Yes"))
         {
             foreach (var item in pathsSaved.paths)
             {
@@ -172,7 +180,10 @@ public class SeedEditor : Editor
 
     void DeleteLastPath()
     {
-        if (GUI.Button(new Rect(20, 60, buttonWidth, buttonHeight), "Delete Last Path"))
+        if (pathsSaved.paths.Count <= 0)
+            return;
+
+        if (GUI.Button(new Rect(20, _deleteLastPathYPos, buttonWidth, buttonHeight), "Delete Last Path"))
         {
             if(pathsSaved.paths.Count > 0)
             {
@@ -186,6 +197,9 @@ public class SeedEditor : Editor
                 if (pathsSaved.paths.LastOrDefault() != null)
                     _target.transform.position = pathsSaved.paths.LastOrDefault().transform.position;
 
+                if (pathsSaved.paths.Count() <= 0)
+                    _target.transform.position = new Vector3(0, 0, 0);
+
                 DestroyImmediate(lastObject);
             }
             else
@@ -197,7 +211,10 @@ public class SeedEditor : Editor
 
     void DeleteLastVessel()
     {
-        if (GUI.Button(new Rect(20, 100, buttonWidth, buttonHeight), "Delete Last Vessel"))
+        if (pathsSaved.vessels.Count <= 0)
+            return;
+
+        if (GUI.Button(new Rect(20, _deleteLastVesselYPos, buttonWidth, buttonHeight), "Delete Last Vessel"))
         {
             if (pathsSaved.vessels.Count > 0)
             {
@@ -218,9 +235,10 @@ public class SeedEditor : Editor
         var p = Camera.current.WorldToScreenPoint(position);
 
         var size = 700 / Vector3.Distance(Camera.current.transform.position, position);
-        size = Mathf.Clamp(size, _buttonMinSize, _buttonMaxSize);
+        //size = Mathf.Clamp(size, _buttonMinSize, _buttonMaxSize);
 
         var r = new Rect(p.x - size / 2, Screen.height - p.y - size, size, size / 2);
+        //screenPos.x - buttonPlusWidth / 2, Camera.current.pixelHeight - screenPos.y - 100, buttonPlusWidth, buttonHeight
 
         var dirTest = new Vector3(position.x, 0, position.z) - new Vector3(_target.transform.position.x, 0, _target.transform.position.z);
 
@@ -295,7 +313,7 @@ public class SeedEditor : Editor
 
         if (_target.mapLoaded)
         {
-            if (!saveMap && GUI.Button(new Rect(20, 180, buttonWidth, buttonHeight), "Overwrite Map"))
+            if (!saveMap && GUI.Button(new Rect(20, _overwriteMapYPos, buttonWidth, buttonHeight), "Overwrite Map"))
             {
                 saveMap = true;
             }
@@ -403,6 +421,10 @@ public class SeedEditor : Editor
     Vector3 GetNextMove(GameObject go, Direction direction)
     {
         Vector3 DistanceToReturn = new Vector3(0, 0, 0);
+
+        if (go == null)
+            return default(Vector3);
+
         switch (direction)
         {
             case Direction.Forward:
@@ -425,6 +447,10 @@ public class SeedEditor : Editor
     Vector3 GetPathPosition(GameObject go, Direction direction)
     {
         Vector3 DistanceToReturn = new Vector3(0, 0, 0);
+
+        if (_target == null || go == null)
+            return default(Vector3);
+
         switch (direction)
         {
             case Direction.Forward:

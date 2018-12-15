@@ -4,6 +4,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
+//[ExecuteInEditMode]
 [CustomEditor(typeof(Path))]
 public class PathEditor : Editor
 {
@@ -17,9 +18,12 @@ public class PathEditor : Editor
     int _buttonMaxSize = 70;
     int _angleToRotate;
 
+    //bool _deletedByKey;
+
     void OnEnable()
     {
-        _target = (Path)target;        
+        _target = (Path)target;
+        //_deletedByKey = false;
     }
 
     public override void OnInspectorGUI()
@@ -33,7 +37,21 @@ public class PathEditor : Editor
 
     void OnSceneGUI()
     {
-        Handles.BeginGUI();        
+        //GUIUtility.hotControl = 0;        
+
+        if (Event.current != null && Event.current.isKey && Event.current.type.Equals(EventType.KeyDown) && Event.current.keyCode == KeyCode.Delete)
+        {
+            Delete();
+            Debug.Log("aprete supr");
+        }
+
+        //if (Input.GetKeyDown(KeyCode.D))
+        //{
+
+        //    Debug.Log("aprete supr");
+        //}
+
+        Handles.BeginGUI();       
 
         SetAsActualPath();
         DeleteActualPath();
@@ -41,13 +59,16 @@ public class PathEditor : Editor
         if (pathsSaved != null)
             pathsSaved.angleToRotate = EditorGUILayout.IntField("Angle to rotate", pathsSaved.angleToRotate, GUILayout.Width(300));
 
+        if (pathsSaved != null && pathsSaved.angleToRotate <= 0)
+            pathsSaved.angleToRotate = 1;
+
         float addValue = 0;
 
         if(_target != null)
         {
             addValue = 30 / Vector3.Distance(Camera.current.transform.position, _target.transform.position);
-            DrawButton("↻", _target.transform.position + Camera.current.transform.up * addValue, Direction.Left);
-            DrawButton("↺", _target.transform.position - Camera.current.transform.up * addValue, Direction.Right);
+            DrawButton("↻", _target.transform.position + Camera.current.transform.right * addValue, Direction.Left);
+            DrawButton("↺", _target.transform.position - Camera.current.transform.right * addValue, Direction.Right);
         }       
 
         Handles.EndGUI();
@@ -57,25 +78,8 @@ public class PathEditor : Editor
     {
         if (GUI.Button(new Rect(20, 100, 130, 30), "Delete path"))
         {
-            var temp = pathsSaved.paths[_target.id];
-            var tempID = temp.GetComponent<Path>().id;
-
-            pathsSaved.paths.RemoveAt(tempID);
-            pathsSaved.objectType.RemoveAt(tempID);
-            pathsSaved.positions.RemoveAt(tempID);
-            pathsSaved.rotations.RemoveAt(tempID);
-
-            //pathsSaved.paths.Remove(temp);
-            //pathsSaved.objectType.Remove(pathsSaved.objectType[tempID]);
-            //pathsSaved.positions.Remove(pathsSaved.positions[tempID]);
-            //pathsSaved.rotations.Remove(pathsSaved.rotations[tempID]);
-
-            for (int i = pathsSaved.paths.Count - 1; i >= _target.id; i--)
-            {
-                pathsSaved.paths[i].GetComponent<Path>().id--;
-            }
-
-            DestroyImmediate(temp);            
+            //_deletedByKey = false;
+            Delete();
         }
     }
 
@@ -194,6 +198,53 @@ public class PathEditor : Editor
 
     private void FixValues()
     {
+
+    }
+
+    public void Delete()
+    {
+        var temp = pathsSaved.paths[_target.id];
+        var tempID = temp.GetComponent<Path>().id;
+
+        pathsSaved.paths.RemoveAt(tempID);
+        pathsSaved.objectType.RemoveAt(tempID);
+        pathsSaved.positions.RemoveAt(tempID);
+        pathsSaved.rotations.RemoveAt(tempID);
+
+        //pathsSaved.paths.Remove(temp);
+        //pathsSaved.objectType.Remove(pathsSaved.objectType[tempID]);
+        //pathsSaved.positions.Remove(pathsSaved.positions[tempID]);
+        //pathsSaved.rotations.Remove(pathsSaved.rotations[tempID]);
+
+        for (int i = pathsSaved.paths.Count - 1; i >= _target.id; i--)
+        {
+            pathsSaved.paths[i].GetComponent<Path>().id--;
+        }
+
+        if (pathsSaved.paths.LastOrDefault() != null)
+            _seed.transform.position = pathsSaved.paths.LastOrDefault().transform.position;
+
+        if (pathsSaved.paths.Count() <= 0)
+            _seed.transform.position = new Vector3(0, 0, 0);
+
+        DestroyImmediate(temp);
+    }
+
+    private void OnDestroy()
+    {
+        //if (!_deletedByKey)
+        //    return;
+
+        //if (_target == null)
+        //    return;
+
+        //if (PrefabUtility.GetPrefabType(_target) == PrefabType.None)
+        //    return;
+
+        //Selection.
+
+        //if (_target.hideFlags == HideFlags.None)
+        //    Delete();
 
     }
 }

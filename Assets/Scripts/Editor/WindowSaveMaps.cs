@@ -15,11 +15,13 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     private string _mapName;
     private string _path;
     private int click;
+    public float maxYSize = 800;
     public PathConfig pathsSaved;
     private string _fullPath;
     private Seed _seed;
     string noPathSelected = "No path selected";
-    
+    private Vector2 _scrollPosition;
+
     public static void CreateWindow() // Crea la ventana a mostrar
     {
         var window = ((WindowSaveMaps)GetWindow(typeof(WindowSaveMaps))); //Esta línea va a obtener la ventana o a crearla. Una vez que haga esto, va a mostrarla.
@@ -51,7 +53,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
 
         foreach (var item in pathsSaved.paths)
         {
-            if (item.GetComponent<MeshFilter>() != null)
+            if (item != null && item.GetComponent<MeshFilter>() != null)
             {
                 pathsSaved.totalPolygons += item.GetComponent<MeshFilter>().sharedMesh.triangles.Length / 3;
             }
@@ -59,7 +61,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
 
         foreach (var item in pathsSaved.vessels)
         {
-            if (item.GetComponent<MeshFilter>() != null)
+            if (item != null && item.GetComponent<MeshFilter>() != null)
             {
                 pathsSaved.totalPolygons += item.GetComponent<MeshFilter>().sharedMesh.triangles.Length / 3;
             }
@@ -71,19 +73,38 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
         if (pathsSaved == null)
             return;
 
+        //EditorGUILayout.BeginHorizontal(GUILayout.Width(maxYSize));
+        //_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, true, true);
+
         _mapName = EditorGUILayout.TextField("Map name", _mapName);
+        
+        if (String.IsNullOrEmpty(_mapName))
+            EditorGUILayout.HelpBox("Name field is empty!", MessageType.Warning);
+
+        if (CheckIfNameExist(_mapName, _fullPath))
+            EditorGUILayout.HelpBox("That name is already in use!", MessageType.Warning);
 
         //EditorGUI.BeginDisabledGroup(true);
         //_fullPath = EditorGUILayout.TextField("Path Selected", _fullPath);
         //pathsSaved.totalPolygons = EditorGUILayout.IntField("Total polygons:", pathsSaved.totalPolygons);
 
         EditorGUILayout.LabelField("Path Selected: " + _fullPath);
+
+        if (!CheckPathSelected())
+            EditorGUILayout.HelpBox("Select the folder where you wish to save the map!", MessageType.Warning);
+
         EditorGUILayout.LabelField("Total polygons: " + pathsSaved.totalPolygons);
         //EditorGUI.EndDisabledGroup();
 
         if (GUILayout.Button("Select folder"))
         {
-            _path = EditorUtility.OpenFolderPanel("Select folder", "Assets/", _path);
+            string tempPathSeparated = "";
+            _path = EditorUtility.OpenFolderPanel("Select folder", "Assets/", string.Empty);
+
+            tempPathSeparated = _path.Split(new[] { "/" }, StringSplitOptions.None).Last();
+            if (tempPathSeparated == "Assets")
+                _path = _path + "/";
+
             _fullPath = _path;
             if (!String.IsNullOrEmpty(_path))
                 _path = _path.Split(new[] { "Assets/" }, StringSplitOptions.None)[1];
@@ -115,17 +136,34 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                                 //separo las diferentes carpetas por el carcater /
                                 tempPath = path.Split('/').ToList();
 
-                                if (path == "Assets/" + _path + "/" + _mapName + ".asset")
+                                if (!String.IsNullOrEmpty(_path))
                                 {
-                                    if (File.Exists(_fullPath + "/" + tempPath.Last()))
+                                    if (path == "Assets/" + _path + "/" + _mapName + ".asset")
                                     {
-                                        currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
-                                        _seed.mapNameLoaded = _mapName;
-                                        _seed.mapLoaded = true;
-                                        _seed.currentMap = currentMap;
-                                        break;
+                                        if (File.Exists(_fullPath + "/" + tempPath.Last()))
+                                        {
+                                            currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
+                                            _seed.mapNameLoaded = _mapName;
+                                            _seed.mapLoaded = true;
+                                            _seed.currentMap = currentMap;
+                                            break;
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    if (path == "Assets/" + _mapName + ".asset")
+                                    {
+                                        if (File.Exists(_fullPath + "/" + tempPath.Last()))
+                                        {
+                                            currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _mapName + ".asset");
+                                            _seed.mapNameLoaded = _mapName;
+                                            _seed.mapLoaded = true;
+                                            _seed.currentMap = currentMap;
+                                            break;
+                                        }
+                                    }
+                                }                                
 
                                 //obtengo la ultima parte, que seria el nombre con la extension y saco la extension
                                 //var currentMapName = tempPath.LastOrDefault().Split('.');
@@ -154,24 +192,20 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                                 currentMap.totalPolygons = pathsSaved.totalPolygons;
                                 //esto hace que cuando cierro unity y lo vuelvo a abrir no se pierda la info
                                 EditorUtility.SetDirty(currentMap);
+
+                                Close();
                             }
                         }
                     }
                 }
-            }
+            }            
         }
 
-        if(!CheckPathSelected())
-            EditorGUILayout.HelpBox("Select the folder where you wish to save the map!", MessageType.Warning);
-
-        if (String.IsNullOrEmpty(_mapName))
-            EditorGUILayout.HelpBox("Name field is empty!", MessageType.Warning);
-
         if (pathsSaved.paths.Count <= 0)
-            EditorGUILayout.HelpBox("There are no objects created in the map!", MessageType.Warning);
+            EditorGUILayout.HelpBox("There are no objects created in the map!", MessageType.Warning);        
 
-        if (CheckIfNameExist(_mapName, _fullPath))
-            EditorGUILayout.HelpBox("That name is already in use!", MessageType.Warning);
+        //EditorGUILayout.EndScrollView();
+        //EditorGUILayout.EndHorizontal();
     }
 
     public bool CheckPathSelected()

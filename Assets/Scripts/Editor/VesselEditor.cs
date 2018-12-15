@@ -93,8 +93,8 @@ public class VesselEditor : Editor
         
         _target.distanceBetweenVessels = EditorGUILayout.FloatField("Distance between vessels: ", _target.distanceBetweenVessels, GUILayout.Width(300));
 
-        if (_target.distanceBetweenVessels < 0)
-            _target.distanceBetweenVessels = 0;        
+        if (_target.distanceBetweenVessels < 0.1)
+            _target.distanceBetweenVessels = 0.1f;
 
         ChangeDistance();
 

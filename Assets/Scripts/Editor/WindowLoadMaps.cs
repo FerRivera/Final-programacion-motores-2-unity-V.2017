@@ -9,7 +9,6 @@ public class WindowLoadMaps : EditorWindow
     List<bool> wantToDeleteList = new List<bool>();
     private Vector2 _scrollPosition;
     public float maxYSize = 500;
-    public float maxXSize = 500;
     public PathConfig pathsSaved;
     private Seed _seed;
     string _searchMap;
@@ -76,9 +75,11 @@ public class WindowLoadMaps : EditorWindow
 
             //EditorGUI.BeginDisabledGroup(true);
             //currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
+
             EditorGUILayout.LabelField("Map name: " + currentMapName[0]);
             EditorGUILayout.LabelField("Total polygons: " + AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons);
             EditorGUILayout.LabelField("Path: " + path);
+
             //EditorGUI.EndDisabledGroup();
 
             if (!wantToDeleteList[i])
@@ -96,16 +97,12 @@ public class WindowLoadMaps : EditorWindow
                 }
                 if (GUILayout.Button("Yes") && wantToDeleteList[i])
                 {
-                    AssetDatabase.DeleteAsset(path);
-
-                    if(_seed.currentMap == currentMap)
+                    wantToDeleteList[i] = false;
+                    AssetDatabase.DeleteAsset(path);                    
+                    if (_seed.currentMap == currentMap)
                     {
                         _seed.mapLoaded = false;
                     }
-                    //if(currentMapName[0] == _seed.mapNameLoaded)
-                    //{
-                        
-                    //}
                 }
             }
 

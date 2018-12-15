@@ -10,7 +10,7 @@ public class VesselsInstantiatorEditor : Editor
 {
     //private VesselsInstantiator _target;
 
-    static bool _editMode = false;
+    public static bool editMode = false;
 
     List<string> layers;
     string[] layerNames;
@@ -22,6 +22,15 @@ public class VesselsInstantiatorEditor : Editor
     static bool preInstantiateVessel;
     static int preInstantiateVesselIndex;
     static GameObject preInstantiateVesselGo = null;
+
+    bool _isClose = false;
+
+    //GUIStyle _style = new GUIStyle();
+    GUIStyle editModeStyle = new GUIStyle();
+    GUIStyle insideVesselLimitStyle = new GUIStyle();
+
+    float _currentTime = 0;
+    float _totalTime = 2;
 
     void OnEnable()
     {
@@ -44,11 +53,14 @@ public class VesselsInstantiatorEditor : Editor
             ScriptableObjectsCreator.CreatePathConfig();
             _pathsSaved = (PathConfig)Resources.Load("PathConfig");
         }
+
+        editModeStyle.fontSize = 20;
+        insideVesselLimitStyle.fontSize = 20;
     }
 
     private void OnDisable()
     {
-        _editMode = false;
+        editMode = false;
         preInstantiateVessel = false;
         preInstantiateVesselIndex = 0;
         DestroyImmediate(preInstantiateVesselGo);
@@ -96,11 +108,11 @@ public class VesselsInstantiatorEditor : Editor
         if (_vesselsSaved.showHelpBox)
             EditorGUILayout.HelpBox("Layer used to place vessels", MessageType.Info);
 
-        if (_editMode)
+        if (editMode)
         {
             if (GUILayout.Button("Disable Editing"))
             {
-                _editMode = false;
+                editMode = false;
                 preInstantiateVessel = false;
             }
         }
@@ -108,7 +120,7 @@ public class VesselsInstantiatorEditor : Editor
         {
             if (GUILayout.Button("Enable Editing"))
             {
-                _editMode = true;
+                editMode = true;
             }
         }
     }
@@ -119,14 +131,22 @@ public class VesselsInstantiatorEditor : Editor
     }
 
     private void OnSceneGUI()
-    {
+    {       
+
         PreInstantiateVessel();
 
-        if(preInstantiateVesselGo != null)
-            Handles.RadiusHandle(preInstantiateVesselGo.transform.rotation, preInstantiateVesselGo.transform.position, _vesselsSaved.distance);        
+        if(preInstantiateVesselGo != null)        
+            Handles.RadiusHandle(preInstantiateVesselGo.transform.rotation, preInstantiateVesselGo.transform.position, _vesselsSaved.distance);
 
-        if (_editMode)
+        if (editMode)
         {
+            editModeStyle.fontSize = 20;
+            Handles.BeginGUI();
+            Vector3 pos = preInstantiateVesselGo.transform.position;
+            Vector2 pos2D = HandleUtility.WorldToGUIPoint(pos).normalized;
+            GUI.Label(new Rect(Camera.current.pixelWidth / 2 - 100, pos2D.y, 100, 100), "Edit mode activated!", editModeStyle);
+            Handles.EndGUI();
+
             if (Event.current.type == EventType.MouseDown)
             {
                 Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
@@ -139,22 +159,53 @@ public class VesselsInstantiatorEditor : Editor
 
                 Event.current.Use();
             }            
+        }        
+        
+        if (_isClose && preInstantiateVesselGo != null && _currentTime <= _totalTime)
+        {
+            _currentTime += Time.deltaTime;
+            insideVesselLimitStyle.fontSize = 20;
+
+            //var p = Camera.current.WorldToScreenPoint(preInstantiateVesselGo.transform.position);
+
+            //var size = Vector3.Distance(Camera.current.transform.position, preInstantiateVesselGo.transform.position);
+            //size = Mathf.Clamp(size, 45, 70);
+            //Debug.Log(Camera.current.transform.position);
+            //Debug.Log(p);
+            //Debug.Log(size);
+            //Vector3 tempLabelPosition = Camera.current.WorldToScreenPoint(new Vector3(preInstantiateVesselGo.transform.localPosition.x, preInstantiateVesselGo.transform.localPosition.y, preInstantiateVesselGo.transform.localPosition.z)).normalized;
+            //Vector3 tempLabelPosition = Camera.current.ScreenToWorldPoint(new Vector3(0, -Camera.current.pixelHeight, 0)).normalized;
+            
+            editModeStyle.fontSize = 20;
+            Handles.BeginGUI();
+            Vector3 pos = preInstantiateVesselGo.transform.position;
+            Vector2 pos2D = HandleUtility.WorldToGUIPoint(pos).normalized;
+            GUI.Label(new Rect(Camera.current.pixelWidth/2-100, pos2D.y+40, 100, 100), "Inside vessel limit!", insideVesselLimitStyle);
+            Handles.EndGUI();
+            //Handles.Label(tempLabelPosition, "Inside vessel limit!", _style);
         }
+        else if(_currentTime > _totalTime)
+        {
+            _currentTime = 0;
+            _isClose = false;
+            insideVesselLimitStyle.fontSize = 0;
+        }
+            
     }
 
     public void PreInstantiateVessel()
     {
-        if (!_editMode)
+        if (!editMode)
             DestroyImmediate(preInstantiateVesselGo);
 
-        if (preInstantiateVessel && _editMode && _vesselsSaved.selectedIndex != preInstantiateVesselIndex)
+        if (preInstantiateVessel && editMode && _vesselsSaved.selectedIndex != preInstantiateVesselIndex)
         {
             preInstantiateVessel = false;
             preInstantiateVesselIndex = 0;
             DestroyImmediate(preInstantiateVesselGo);
         }            
 
-        if (_editMode && !preInstantiateVessel && preInstantiateVesselGo == null)
+        if (editMode && !preInstantiateVessel && preInstantiateVesselGo == null)
         {
             preInstantiateVessel = true;
             preInstantiateVesselGo = (GameObject)Instantiate(_objects[_vesselsSaved.selectedIndex]);            
@@ -180,9 +231,10 @@ public class VesselsInstantiatorEditor : Editor
 
     void CreateVessel(Ray MouseRay, RaycastHit MousePosHit)
     {
+        Vector3 pos = Vector3.zero;        
+
         if (Physics.Raycast(MouseRay, out MousePosHit, float.MaxValue, _vesselsSaved.map))
         {
-            //var dir = MousePosHit.point + (Camera.main.transform.position - MousePosHit.point).normalized;
             var dir = MousePosHit.point;
 
             GameObject vessel = (GameObject)Instantiate(_objects[_vesselsSaved.selectedIndex]);
@@ -201,12 +253,12 @@ public class VesselsInstantiatorEditor : Editor
 
             float y = vessel.GetComponent<Renderer>().bounds.size.y / 2;
 
-            Vector3 pos = new Vector3(dir.x, dir.y + y, dir.z);
-            vessel.transform.position = pos;
+            pos = new Vector3(dir.x, dir.y + y, dir.z);
+            vessel.transform.position = pos;            
 
-            CheckCloserVessels(vessel.transform.position,vessel);
+            _isClose = CheckCloserVessels(vessel.transform.position,vessel);                           
 
-            if(vessel != null)
+            if (vessel != null)
             {
                 _pathsSaved.vessels.Add(vessel);
                 _pathsSaved.vesselsPositions.Add(vessel.transform.position);
@@ -216,7 +268,7 @@ public class VesselsInstantiatorEditor : Editor
         }
     }
 
-    void CheckCloserVessels(Vector3 position,GameObject go)
+    bool CheckCloserVessels(Vector3 position,GameObject go)
     {
         var temp = Physics.OverlapSphere(position, _pathsSaved.maxVesselDistance, _vesselsSaved.vessels).ToList();
 
@@ -225,11 +277,16 @@ public class VesselsInstantiatorEditor : Editor
         foreach (var item in temp)
         {
             float distance = item.gameObject.GetComponent<Vessel>().distanceBetweenVessels;
-            var vessels = Physics.OverlapSphere(item.transform.position, distance, _vesselsSaved.vessels).ToList();
+            var vessels = Physics.OverlapSphere(item.transform.position, distance, _vesselsSaved.vessels).ToList();           
 
-            if(go != null && vessels.Contains(go.GetComponent<Collider>()))
-                DestroyImmediate(go); 
+            if (go != null && vessels.Contains(go.GetComponent<Collider>()))
+            {
+                DestroyImmediate(go);
+                return true;
+            }                
         }
+
+        return false;
     }
 
     public LayerMask LayerMaskField(string label, LayerMask selected)
