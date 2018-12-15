@@ -19,4 +19,22 @@ public class Vessel : MonoBehaviour
     {
         
     }
+
+    public void Delete(PathConfig _pathsSaved)
+    {
+        var temp = _pathsSaved.vessels[id];
+        var tempID = temp.GetComponent<Vessel>().id;
+
+        _pathsSaved.vessels.RemoveAt(tempID);
+        _pathsSaved.vesselsType.RemoveAt(tempID);
+        _pathsSaved.vesselsPositions.RemoveAt(tempID);
+        _pathsSaved.vesselsDistance.RemoveAt(tempID);
+
+        for (int i = _pathsSaved.vessels.Count - 1; i >= id; i--)
+        {
+            _pathsSaved.vessels[i].GetComponent<Vessel>().id--;
+        }
+
+        DestroyImmediate(temp);
+    }
 }

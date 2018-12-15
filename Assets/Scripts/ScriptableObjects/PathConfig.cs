@@ -4,30 +4,30 @@ using UnityEngine;
 
 public class PathConfig : ScriptableObject 
 {
-    [HideInInspector]
+    //[HideInInspector]
     public List<GameObject> paths = new List<GameObject>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<Vector3> positions = new List<Vector3>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<int> objectType = new List<int>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<Quaternion> rotations = new List<Quaternion>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<Object> objectsToInstantiate = new List<Object>();
-    [HideInInspector]
+    //[HideInInspector]
     public int angleToRotate;
-    [HideInInspector]
+    //[HideInInspector]
     public int totalPolygons;
-    [HideInInspector]
+    //[HideInInspector]
     public float maxVesselDistance;
-    [HideInInspector]
+    //[HideInInspector]
     public List<GameObject> vessels = new List<GameObject>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<Vector3> vesselsPositions = new List<Vector3>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<int> vesselsType = new List<int>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<float> vesselsDistance = new List<float>();
-    [HideInInspector]
+    //[HideInInspector]
     public List<Object> vesselsToInstantiate = new List<Object>();
 }

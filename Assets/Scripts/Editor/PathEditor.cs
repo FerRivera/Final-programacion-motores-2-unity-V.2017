@@ -37,19 +37,11 @@ public class PathEditor : Editor
 
     void OnSceneGUI()
     {
-        //GUIUtility.hotControl = 0;        
-
         if (Event.current != null && Event.current.isKey && Event.current.type.Equals(EventType.KeyDown) && Event.current.keyCode == KeyCode.Delete)
         {
             Delete();
-            Debug.Log("aprete supr");
+            //Debug.Log("aprete supr");
         }
-
-        //if (Input.GetKeyDown(KeyCode.D))
-        //{
-
-        //    Debug.Log("aprete supr");
-        //}
 
         Handles.BeginGUI();       
 

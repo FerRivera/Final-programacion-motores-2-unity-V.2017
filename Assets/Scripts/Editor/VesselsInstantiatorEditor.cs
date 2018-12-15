@@ -283,7 +283,7 @@ public class VesselsInstantiatorEditor : Editor
             {
                 DestroyImmediate(go);
                 return true;
-            }                
+            }
         }
 
         return false;

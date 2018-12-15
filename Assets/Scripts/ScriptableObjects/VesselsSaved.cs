@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class VesselsSaved : ScriptableObject
 {
-    [HideInInspector]
+    //[HideInInspector]
     public float distance;
-    [HideInInspector]
+    //[HideInInspector]
     public int selectedIndex;
-    [HideInInspector]
+    //[HideInInspector]
     public LayerMask vessels;
-    [HideInInspector]
+    //[HideInInspector]
     public LayerMask map;
-    [HideInInspector]
+    //[HideInInspector]
     public bool showHelpBox;
-    [HideInInspector]
+    //[HideInInspector]
     public bool showVesselsLimits;
 }

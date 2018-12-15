@@ -142,11 +142,7 @@ public class SeedEditor : Editor
             newMap = true;
         }
 
-        if(newMap && GUI.Button(new Rect(20, _newMapYPos, buttonWidth, buttonHeight), "No"))
-        {
-            newMap = false;
-        }
-        if (newMap && GUI.Button(new Rect(160, _newMapYPos, buttonWidth, buttonHeight), "Yes"))
+        if(newMap && EditorUtility.DisplayDialog("Start a new map?","Are you sure you want to start a new map?", "Yes", "No"))
         {
             foreach (var item in pathsSaved.paths)
             {
@@ -176,6 +172,43 @@ public class SeedEditor : Editor
             newMap = false;
             _target.mapLoaded = false;
         }
+        else
+            newMap = false;
+
+        //if (newMap && GUI.Button(new Rect(20, _newMapYPos, buttonWidth, buttonHeight), "No"))
+        //{
+        //    newMap = false;
+        //}
+        //if (newMap && GUI.Button(new Rect(160, _newMapYPos, buttonWidth, buttonHeight), "Yes"))
+        //{
+        //    foreach (var item in pathsSaved.paths)
+        //    {
+        //        DestroyImmediate(item);
+        //    }
+
+        //    foreach (var item in pathsSaved.vessels)
+        //    {
+        //        DestroyImmediate(item);
+        //    }
+
+        //    pathsSaved.paths.Clear();
+        //    pathsSaved.objectType.Clear();
+        //    pathsSaved.positions.Clear();
+        //    pathsSaved.rotations.Clear();
+
+        //    pathsSaved.vessels.Clear();
+        //    pathsSaved.vesselsPositions.Clear();
+        //    pathsSaved.vesselsType.Clear();
+        //    pathsSaved.vesselsDistance.Clear();
+
+        //    pathsSaved.maxVesselDistance = 0;
+        //    pathsSaved.totalPolygons = 0;
+
+        //    _target.transform.position = new Vector3(0, 0, 0);
+
+        //    newMap = false;
+        //    _target.mapLoaded = false;
+        //}
     }
 
     void DeleteLastPath()
@@ -223,7 +256,7 @@ public class SeedEditor : Editor
                 pathsSaved.vesselsType.RemoveAt(pathsSaved.vessels.Count - 1);
                 pathsSaved.vesselsPositions.RemoveAt(pathsSaved.vessels.Count - 1);
                 pathsSaved.vessels.Remove(lastObject);
-                pathsSaved.vesselsDistance.Remove(pathsSaved.vesselsDistance.Count - 1);
+                pathsSaved.vesselsDistance.RemoveAt(pathsSaved.vesselsDistance.Count - 1);
 
                 DestroyImmediate(lastObject);
             }            
@@ -318,49 +351,8 @@ public class SeedEditor : Editor
                 saveMap = true;
             }
 
-            if (saveMap && GUI.Button(new Rect(20, 180, buttonWidth, buttonHeight), "No"))
+            if (saveMap && EditorUtility.DisplayDialog("Overwrite current map?", "Are you sure you want to overwrite the current map?", "Yes", "No"))
             {
-                saveMap = false;
-            }
-            if (saveMap && GUI.Button(new Rect(160, 180, buttonWidth, buttonHeight), "Yes"))
-            {
-                //List<string> tempPath = new List<string>();
-
-                //var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
-
-                //MapsSaved _targetcurrentMap = null;
-
-                //for (int i = asset.Length - 1; i >= 0; i--)
-                //{
-                    //string path = AssetDatabase.GUIDToAssetPath(asset[i]);
-                    ////separo las diferentes carpetas por el carcater /
-                    //tempPath = path.Split('/').ToList();
-
-                    //if (path == "Assets/" + _path + "/" + _mapName + ".asset")
-                    //{
-                    //    if (File.Exists(_fullPath + "/" + tempPath.Last()))
-                    //    {
-                    //        currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
-                    //        _seed.mapNameLoaded = _mapName;
-                    //        _seed.mapLoaded = true;
-                    //        break;
-                    //    }
-                    //}
-
-                    ////obtengo todo el path
-                    //string path = AssetDatabase.GUIDToAssetPath(asset[i]);
-                    ////separo las diferentes carpetas por el carcater /
-                    //tempPath = path.Split('/').ToList();
-                    ////obtengo la ultima parte, que seria el nombre con la extension y saco la extension
-                    //var currentMapName = tempPath.LastOrDefault().Split('.');
-                    ////si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
-                    //if (currentMapName[0] == _target.mapNameLoaded)
-                    //{
-                    //    currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
-                    //    break;
-                    //}
-                //}
-
                 if (_target.currentMap != null)
                 {
                     _target.currentMap.paths.Clear();
@@ -391,6 +383,52 @@ public class SeedEditor : Editor
                     saveMap = false;
                 }
             }
+            else
+                saveMap = false;
+
+            //if (saveMap && GUI.Button(new Rect(20, 180, buttonWidth, buttonHeight), "No"))
+            //{
+            //    saveMap = false;
+            //}
+            //if (saveMap && GUI.Button(new Rect(160, 180, buttonWidth, buttonHeight), "Yes"))
+            //{
+            //    //List<string> tempPath = new List<string>();
+
+            //    //var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
+
+            //    //MapsSaved _targetcurrentMap = null;
+
+            //    //for (int i = asset.Length - 1; i >= 0; i--)
+            //    //{
+            //        //string path = AssetDatabase.GUIDToAssetPath(asset[i]);
+            //        ////separo las diferentes carpetas por el carcater /
+            //        //tempPath = path.Split('/').ToList();
+
+            //        //if (path == "Assets/" + _path + "/" + _mapName + ".asset")
+            //        //{
+            //        //    if (File.Exists(_fullPath + "/" + tempPath.Last()))
+            //        //    {
+            //        //        currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
+            //        //        _seed.mapNameLoaded = _mapName;
+            //        //        _seed.mapLoaded = true;
+            //        //        break;
+            //        //    }
+            //        //}
+
+            //        ////obtengo todo el path
+            //        //string path = AssetDatabase.GUIDToAssetPath(asset[i]);
+            //        ////separo las diferentes carpetas por el carcater /
+            //        //tempPath = path.Split('/').ToList();
+            //        ////obtengo la ultima parte, que seria el nombre con la extension y saco la extension
+            //        //var currentMapName = tempPath.LastOrDefault().Split('.');
+            //        ////si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
+            //        //if (currentMapName[0] == _target.mapNameLoaded)
+            //        //{
+            //        //    currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
+            //        //    break;
+            //        //}
+            //    //}
+            //}
         }
     }
 

@@ -20,7 +20,7 @@ public class VesselEditor : Editor
         if (_vesselsSaved == null)
         {
             ScriptableObjectsCreator.CreateVesselsConfig();
-            _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");            
+            _vesselsSaved = (VesselsSaved)Resources.Load("VesselsConfig");
         }
 
         EditorUtility.SetDirty(_vesselsSaved);
@@ -37,11 +37,11 @@ public class VesselEditor : Editor
 
     private void ShowValues()
     {
-        _pathsSaved = (PathConfig)Resources.Load("PathConfig");        
+        _pathsSaved = (PathConfig)Resources.Load("PathConfig");
 
         _target.currentIndex = EditorGUILayout.Popup("Actual type", _target.currentIndex, _pathsSaved.vesselsToInstantiate.Select(x => x.name).ToArray());
 
-        ShowPreview();        
+        ShowPreview();
 
         //_target.id = EditorGUILayout.IntField("ID", _target.id);
 
@@ -100,40 +100,65 @@ public class VesselEditor : Editor
 
         DeleteActualVessel();
 
+        DeleteVesselsInsideLimit();
+
         Handles.EndGUI();
+    }
+
+    public void DeleteVesselsInsideLimit()
+    {
+        if (GUI.Button(new Rect(20, 90, 130, 30), "Delete closer vessels"))
+        {
+            if(EditorUtility.DisplayDialog("Delete close vessels?", "Are you sure you want to delete all vessels inside the limits?", "Yes", "No"))
+            {
+                var temp = Physics.OverlapSphere(_target.transform.position, _target.distanceBetweenVessels, _vesselsSaved.vessels).ToList();
+
+                temp.Remove(_target.GetComponent<Collider>());
+
+                foreach (var item in temp)
+                {
+                    item.gameObject.GetComponent<Vessel>().Delete(_pathsSaved);
+                }
+            }
+        }
     }
 
     public void ChangeDistance()
     {
         if (_target != null && _pathsSaved != null && _pathsSaved.maxVesselDistance < _target.distanceBetweenVessels)
         {
-            _pathsSaved.maxVesselDistance = _target.distanceBetweenVessels;            
+            _pathsSaved.maxVesselDistance = _target.distanceBetweenVessels;
         }
-         
+        
         if(_target != null && _pathsSaved && _pathsSaved.vesselsDistance[_target.id] != _target.distanceBetweenVessels)
             _pathsSaved.vesselsDistance[_target.id] = _target.distanceBetweenVessels;
     }
 
-    void DeleteActualVessel()
+    public void DeleteActualVessel()
     {
         if (GUI.Button(new Rect(20, 50, 130, 30), "Delete vessel"))
         {
-            var temp = _pathsSaved.vessels[_target.id];
-            var tempID = temp.GetComponent<Vessel>().id;
-
-            _pathsSaved.vessels.RemoveAt(tempID);
-            _pathsSaved.vesselsType.RemoveAt(tempID);
-            _pathsSaved.vesselsPositions.RemoveAt(tempID);
-            _pathsSaved.vesselsDistance.RemoveAt(tempID);
-
-            for (int i = _pathsSaved.vessels.Count - 1; i >= _target.id; i--)
-            {
-                _pathsSaved.vessels[i].GetComponent<Vessel>().id--;
-            }
-
-            DestroyImmediate(temp);
+            _target.Delete(_pathsSaved);
         }
     }
+
+    //public void Delete()
+    //{
+    //    var temp = _pathsSaved.vessels[_target.id];
+    //    var tempID = temp.GetComponent<Vessel>().id;
+
+    //    _pathsSaved.vessels.RemoveAt(tempID);
+    //    _pathsSaved.vesselsType.RemoveAt(tempID);
+    //    _pathsSaved.vesselsPositions.RemoveAt(tempID);
+    //    _pathsSaved.vesselsDistance.RemoveAt(tempID);
+
+    //    for (int i = _pathsSaved.vessels.Count - 1; i >= _target.id; i--)
+    //    {
+    //        _pathsSaved.vessels[i].GetComponent<Vessel>().id--;
+    //    }
+
+    //    DestroyImmediate(temp);
+    //}
 
     private void FixValues()
     {
