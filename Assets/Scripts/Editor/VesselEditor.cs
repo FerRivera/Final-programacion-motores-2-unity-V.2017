@@ -89,6 +89,11 @@ public class VesselEditor : Editor
 
     void OnSceneGUI()
     {
+        if (Event.current != null && Event.current.isKey && Event.current.type.Equals(EventType.KeyDown) && Event.current.keyCode == KeyCode.Delete)
+        {
+            _target.Delete(_pathsSaved);
+        }
+
         Handles.BeginGUI();
         
         _target.distanceBetweenVessels = EditorGUILayout.FloatField("Distance between vessels: ", _target.distanceBetweenVessels, GUILayout.Width(300));
@@ -141,24 +146,6 @@ public class VesselEditor : Editor
             _target.Delete(_pathsSaved);
         }
     }
-
-    //public void Delete()
-    //{
-    //    var temp = _pathsSaved.vessels[_target.id];
-    //    var tempID = temp.GetComponent<Vessel>().id;
-
-    //    _pathsSaved.vessels.RemoveAt(tempID);
-    //    _pathsSaved.vesselsType.RemoveAt(tempID);
-    //    _pathsSaved.vesselsPositions.RemoveAt(tempID);
-    //    _pathsSaved.vesselsDistance.RemoveAt(tempID);
-
-    //    for (int i = _pathsSaved.vessels.Count - 1; i >= _target.id; i--)
-    //    {
-    //        _pathsSaved.vessels[i].GetComponent<Vessel>().id--;
-    //    }
-
-    //    DestroyImmediate(temp);
-    //}
 
     private void FixValues()
     {

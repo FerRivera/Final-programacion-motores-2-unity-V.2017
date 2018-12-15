@@ -95,13 +95,13 @@ public class SeedEditor : Editor
 
     public void OpenSaveMapWindow()
     {
-        //if (!_target.mapLoaded)
-        //{
-            if (GUI.Button(new Rect(20, _saveNewMapYPos, buttonWidth, buttonHeight), "Save new Map"))
-            {
-                WindowSaveMaps.CreateWindow();
-            }
-        //}
+        if (pathsSaved.paths.Count <= 0)
+            return;
+
+        if (GUI.Button(new Rect(20, _saveNewMapYPos, buttonWidth, buttonHeight), "Save new Map"))
+        {
+            WindowSaveMaps.CreateWindow();
+        }
     }
 
     public void ConfigurateObjects()

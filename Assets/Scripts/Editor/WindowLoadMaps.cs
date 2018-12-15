@@ -55,6 +55,8 @@ public class WindowLoadMaps : EditorWindow
         if (asset.Length <= 0)
             EditorGUILayout.HelpBox("There are no maps saved! You have to create a new one before", MessageType.Info);
 
+        EditorGUILayout.HelpBox("Last map loaded is written with bold letters", MessageType.Info);
+
         EditorGUILayout.BeginVertical(GUILayout.Height(maxYSize));
         _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, true, true);        
 
@@ -76,9 +78,19 @@ public class WindowLoadMaps : EditorWindow
             //EditorGUI.BeginDisabledGroup(true);
             //currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
 
-            EditorGUILayout.LabelField("Map name: " + currentMapName[0]);
-            EditorGUILayout.LabelField("Total polygons: " + AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons);
-            EditorGUILayout.LabelField("Path: " + path);
+
+            if(_seed.mapLoadedIndex == i)
+            {
+                EditorGUILayout.LabelField("Map name: " + currentMapName[0], EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Total polygons: " + AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons, EditorStyles.boldLabel);
+                EditorGUILayout.LabelField("Path: " + path, EditorStyles.boldLabel);
+            }
+            else
+            {
+                EditorGUILayout.LabelField("Map name: " + currentMapName[0]);
+                EditorGUILayout.LabelField("Total polygons: " + AssetDatabase.LoadAssetAtPath<MapsSaved>(path).totalPolygons);
+                EditorGUILayout.LabelField("Path: " + path);
+            }           
 
             //EditorGUI.EndDisabledGroup();
 
@@ -86,7 +98,7 @@ public class WindowLoadMaps : EditorWindow
             {
                 if (!wantToDeleteList[i] && GUILayout.Button("Delete map"))
                 {
-                    wantToDeleteList[i] = true;
+                    wantToDeleteList[i] = true;                    
                 }
             }
             else
@@ -102,7 +114,8 @@ public class WindowLoadMaps : EditorWindow
                     if (_seed.currentMap == currentMap)
                     {
                         _seed.mapLoaded = false;
-                    }
+                        _seed.mapLoadedIndex = -1;
+                    }                    
                 }
             }
 
@@ -111,6 +124,7 @@ public class WindowLoadMaps : EditorWindow
                 _seed.mapNameLoaded = currentMapName[0];
                 currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
                 _seed.currentMap = currentMap;
+                _seed.mapLoadedIndex = i;
                 LoadMapOnScene(currentMap);
             }
 

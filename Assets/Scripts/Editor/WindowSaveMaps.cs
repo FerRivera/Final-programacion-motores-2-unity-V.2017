@@ -146,6 +146,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                                             _seed.mapNameLoaded = _mapName;
                                             _seed.mapLoaded = true;
                                             _seed.currentMap = currentMap;
+                                            _seed.mapLoadedIndex = i;
                                             break;
                                         }
                                     }
@@ -160,6 +161,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                                             _seed.mapNameLoaded = _mapName;
                                             _seed.mapLoaded = true;
                                             _seed.currentMap = currentMap;
+                                            _seed.mapLoadedIndex = i;
                                             break;
                                         }
                                     }
