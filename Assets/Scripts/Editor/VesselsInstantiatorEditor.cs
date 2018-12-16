@@ -90,6 +90,26 @@ public class VesselsInstantiatorEditor : Editor
 
         _vesselsSaved.showHelpBox = EditorGUILayout.Toggle("Show Helpbox", _vesselsSaved.showHelpBox);
 
+        _vesselsSaved.gizmoInstantiatedVessel = EditorGUILayout.ColorField("Color vessel limits", _vesselsSaved.gizmoInstantiatedVessel);
+
+        if (_vesselsSaved.gizmoInstantiatedVessel.a < 1)
+            _vesselsSaved.gizmoInstantiatedVessel.a = 1;
+
+        _vesselsSaved.gizmoPredictionVessel = EditorGUILayout.ColorField("Color prediction vessel limits", _vesselsSaved.gizmoPredictionVessel);
+
+        if (_vesselsSaved.gizmoPredictionVessel.a < 1)
+            _vesselsSaved.gizmoPredictionVessel.a = 1;
+
+        _vesselsSaved.editModeEnabled = EditorGUILayout.ColorField("Edit mode warning color", _vesselsSaved.editModeEnabled);
+
+        if (_vesselsSaved.editModeEnabled.a < 1)
+            _vesselsSaved.editModeEnabled.a = 1;
+
+        _vesselsSaved.insideVesselLimit = EditorGUILayout.ColorField("Vessel limits warning color", _vesselsSaved.insideVesselLimit);
+
+        if (_vesselsSaved.insideVesselLimit.a < 1)
+            _vesselsSaved.insideVesselLimit.a = 1;
+
         _vesselsSaved.distance = EditorGUILayout.FloatField("Distance between vessels", _vesselsSaved.distance);
 
         if (_vesselsSaved.distance < 0)
@@ -125,6 +145,12 @@ public class VesselsInstantiatorEditor : Editor
         }
     }
 
+    public static void ExitGUI()
+    {
+        GUIUtility.ExitGUI();
+        throw new ExitGUIException();
+    }
+
     private void FixValues()
     {
 
@@ -135,13 +161,19 @@ public class VesselsInstantiatorEditor : Editor
 
         PreInstantiateVessel();
 
-        if(preInstantiateVesselGo != null)        
+        if(preInstantiateVesselGo != null)
+        {
+            Handles.color = _vesselsSaved.gizmoPredictionVessel;
+
             Handles.RadiusHandle(preInstantiateVesselGo.transform.rotation, preInstantiateVesselGo.transform.position, _vesselsSaved.distance);
+        }            
 
         if (editMode)
         {
-            editModeStyle.fontSize = 20;
             Handles.BeginGUI();
+            editModeStyle.fontSize = 20;
+            if(_vesselsSaved != null)
+                editModeStyle.normal.textColor = _vesselsSaved.editModeEnabled;
             Vector3 pos = preInstantiateVesselGo.transform.position;
             Vector2 pos2D = HandleUtility.WorldToGUIPoint(pos).normalized;
             GUI.Label(new Rect(Camera.current.pixelWidth / 2 - 100, pos2D.y, 100, 100), "Edit mode activated!", editModeStyle);
@@ -175,9 +207,11 @@ public class VesselsInstantiatorEditor : Editor
             //Debug.Log(size);
             //Vector3 tempLabelPosition = Camera.current.WorldToScreenPoint(new Vector3(preInstantiateVesselGo.transform.localPosition.x, preInstantiateVesselGo.transform.localPosition.y, preInstantiateVesselGo.transform.localPosition.z)).normalized;
             //Vector3 tempLabelPosition = Camera.current.ScreenToWorldPoint(new Vector3(0, -Camera.current.pixelHeight, 0)).normalized;
-            
-            editModeStyle.fontSize = 20;
+
             Handles.BeginGUI();
+            insideVesselLimitStyle.fontSize = 20;
+            if (_vesselsSaved != null)
+                insideVesselLimitStyle.normal.textColor = _vesselsSaved.insideVesselLimit;
             Vector3 pos = preInstantiateVesselGo.transform.position;
             Vector2 pos2D = HandleUtility.WorldToGUIPoint(pos).normalized;
             GUI.Label(new Rect(Camera.current.pixelWidth/2-100, pos2D.y+40, 100, 100), "Inside vessel limit!", insideVesselLimitStyle);

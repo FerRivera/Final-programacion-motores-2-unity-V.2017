@@ -17,4 +17,12 @@ public class VesselsSaved : ScriptableObject
     public bool showHelpBox;
     //[HideInInspector]
     public bool showVesselsLimits;
+    //[HideInInspector]
+    public Color gizmoInstantiatedVessel;
+    //[HideInInspector]
+    public Color gizmoPredictionVessel;
+    //[HideInInspector]
+    public Color editModeEnabled;
+    //[HideInInspector]
+    public Color insideVesselLimit;
 }

@@ -12,10 +12,10 @@ public class GizmosVesselsManagerEditor : Editor
     [DrawGizmo(GizmoType.InSelectionHierarchy | GizmoType.NotInSelectionHierarchy)]
     static void DrawHandles(Vessel item, GizmoType gizmoType)
     {
-        if (_vesselsSaved != null && !_vesselsSaved.showVesselsLimits)
+        if (_vesselsSaved == null || !_vesselsSaved.showVesselsLimits)
             return;
 
-        Handles.color = Color.black;
+        Handles.color = _vesselsSaved.gizmoInstantiatedVessel;
 
         Handles.RadiusHandle(item.transform.rotation, item.transform.position, item.distanceBetweenVessels);
     }
@@ -51,7 +51,7 @@ public class GizmosVesselsManagerEditor : Editor
         if (!_vesselsSaved.showVesselsLimits)
             return;
 
-        Handles.color = Color.black;
+        Handles.color = _vesselsSaved.gizmoInstantiatedVessel;
 
         foreach (var item in _pathsSaved.vessels)
         {

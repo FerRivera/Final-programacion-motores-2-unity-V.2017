@@ -14,17 +14,6 @@ public class SeedEditor : Editor
     public float buttonWidth = 130;
     public float buttonHeight = 30;
 
-    //int _buttonMinSize = 45;
-    //int _buttonMaxSize = 70;
-    
-    //int _newMapYPos = 20;
-    //int _saveNewMapYPos = 60;
-    int _deleteLastPathYPos = 140;
-    int _deleteLastVesselYPos = 180;
-    int _overwriteMapYPos = 100;
-
-     //20, _saveNewMapYPos, buttonWidth, buttonHeight
-
     public PathConfig pathsSaved;
     SceneButtonsConfig _sceneButtonsConfig;
 
@@ -34,6 +23,8 @@ public class SeedEditor : Editor
     void OnEnable()
     {
         _target = (Seed)target;
+
+        _target.gameObject.tag = "Seed";
 
         pathsSaved = (PathConfig)Resources.Load("PathConfig");
 
@@ -188,6 +179,7 @@ public class SeedEditor : Editor
 
             newMap = false;
             _target.mapLoaded = false;
+            _target.mapLoadedIndex = -1;
         }
         else
             newMap = false;
