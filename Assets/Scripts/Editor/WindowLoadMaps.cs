@@ -13,7 +13,7 @@ public class WindowLoadMaps : EditorWindow
     private Seed _seed;
     string _searchMap;
 
-    [MenuItem("Level options/Load map")]
+    [MenuItem("Tool options/Load map")]
     static void CreateWindow()
     {
         var window = ((WindowLoadMaps)GetWindow(typeof(WindowLoadMaps),false, "Load map"));

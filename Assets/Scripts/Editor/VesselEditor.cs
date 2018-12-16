@@ -10,6 +10,7 @@ public class VesselEditor : Editor
     PathConfig _pathsSaved;
     Vessel _target;
     VesselsSaved _vesselsSaved;
+    SceneButtonsConfig _sceneButtonsConfig;
 
     void OnEnable()
     {
@@ -24,6 +25,16 @@ public class VesselEditor : Editor
         }
 
         EditorUtility.SetDirty(_vesselsSaved);
+
+        _sceneButtonsConfig = (SceneButtonsConfig)Resources.Load("SceneButtonsConfig");
+
+        if (_sceneButtonsConfig == null)
+        {
+            ScriptableObjectsCreator.CreateSceneButtonsConfig();
+            _sceneButtonsConfig = (SceneButtonsConfig)Resources.Load("SceneButtonsConfig");
+        }
+
+        EditorUtility.SetDirty(_sceneButtonsConfig);
     }
 
     public override void OnInspectorGUI()
@@ -112,7 +123,7 @@ public class VesselEditor : Editor
 
     public void DeleteVesselsInsideLimit()
     {
-        if (GUI.Button(new Rect(20, 90, 130, 30), "Delete closer vessels"))
+        if (GUI.Button(_sceneButtonsConfig.deleteCloserVesselsRect, "Delete closer vessels"))
         {
             if(EditorUtility.DisplayDialog("Delete close vessels?", "Are you sure you want to delete all vessels inside the limits?", "Yes", "No"))
             {
@@ -141,7 +152,7 @@ public class VesselEditor : Editor
 
     public void DeleteActualVessel()
     {
-        if (GUI.Button(new Rect(20, 50, 130, 30), "Delete vessel"))
+        if (GUI.Button(_sceneButtonsConfig.deleteVesselRect, "Delete vessel"))
         {
             _target.Delete(_pathsSaved);
         }

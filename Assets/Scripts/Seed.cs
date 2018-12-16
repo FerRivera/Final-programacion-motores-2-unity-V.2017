@@ -11,4 +11,5 @@ public class Seed : MonoBehaviour
     public string mapNameLoaded;
     public MapsSaved currentMap;
     public int mapLoadedIndex;
+    
 }

@@ -16,13 +16,17 @@ public class SeedEditor : Editor
 
     //int _buttonMinSize = 45;
     //int _buttonMaxSize = 70;
-    int _newMapYPos = 20;
-    int _saveNewMapYPos = 60;
+    
+    //int _newMapYPos = 20;
+    //int _saveNewMapYPos = 60;
     int _deleteLastPathYPos = 140;
     int _deleteLastVesselYPos = 180;
     int _overwriteMapYPos = 100;
 
+     //20, _saveNewMapYPos, buttonWidth, buttonHeight
+
     public PathConfig pathsSaved;
+    SceneButtonsConfig _sceneButtonsConfig;
 
     public bool newMap = false;
     public bool saveMap = false;
@@ -38,6 +42,19 @@ public class SeedEditor : Editor
             ScriptableObjectsCreator.CreatePathConfig();
             pathsSaved = (PathConfig)Resources.Load("PathConfig");
         }
+
+        _sceneButtonsConfig = (SceneButtonsConfig)Resources.Load("SceneButtonsConfig");
+
+        if (_sceneButtonsConfig == null)
+        {
+            ScriptableObjectsCreator.CreateSceneButtonsConfig();
+            _sceneButtonsConfig = (SceneButtonsConfig)Resources.Load("SceneButtonsConfig");
+        }
+
+        EditorUtility.SetDirty(_sceneButtonsConfig);
+
+        ConfigurateButtonsByDefault();
+        //sceneButtonsConfig.saveNewMapRect = new Rect(20, 60, buttonWidth, buttonHeight);
     }
 
     public override void OnInspectorGUI()
@@ -98,7 +115,7 @@ public class SeedEditor : Editor
         if (pathsSaved.paths.Count <= 0)
             return;
 
-        if (GUI.Button(new Rect(20, _saveNewMapYPos, buttonWidth, buttonHeight), "Save new Map"))
+        if (GUI.Button(_sceneButtonsConfig.saveNewMapRect, "Save new Map"))
         {
             WindowSaveMaps.CreateWindow();
         }
@@ -137,7 +154,7 @@ public class SeedEditor : Editor
 
     void NewMap()
     {
-        if (!newMap && GUI.Button(new Rect(20, _newMapYPos, buttonWidth, buttonHeight), "New Map"))
+        if (!newMap && GUI.Button(_sceneButtonsConfig.newMapRect, "New Map"))
         {                
             newMap = true;
         }
@@ -174,41 +191,6 @@ public class SeedEditor : Editor
         }
         else
             newMap = false;
-
-        //if (newMap && GUI.Button(new Rect(20, _newMapYPos, buttonWidth, buttonHeight), "No"))
-        //{
-        //    newMap = false;
-        //}
-        //if (newMap && GUI.Button(new Rect(160, _newMapYPos, buttonWidth, buttonHeight), "Yes"))
-        //{
-        //    foreach (var item in pathsSaved.paths)
-        //    {
-        //        DestroyImmediate(item);
-        //    }
-
-        //    foreach (var item in pathsSaved.vessels)
-        //    {
-        //        DestroyImmediate(item);
-        //    }
-
-        //    pathsSaved.paths.Clear();
-        //    pathsSaved.objectType.Clear();
-        //    pathsSaved.positions.Clear();
-        //    pathsSaved.rotations.Clear();
-
-        //    pathsSaved.vessels.Clear();
-        //    pathsSaved.vesselsPositions.Clear();
-        //    pathsSaved.vesselsType.Clear();
-        //    pathsSaved.vesselsDistance.Clear();
-
-        //    pathsSaved.maxVesselDistance = 0;
-        //    pathsSaved.totalPolygons = 0;
-
-        //    _target.transform.position = new Vector3(0, 0, 0);
-
-        //    newMap = false;
-        //    _target.mapLoaded = false;
-        //}
     }
 
     void DeleteLastPath()
@@ -216,7 +198,7 @@ public class SeedEditor : Editor
         if (pathsSaved.paths.Count <= 0)
             return;
 
-        if (GUI.Button(new Rect(20, _deleteLastPathYPos, buttonWidth, buttonHeight), "Delete Last Path"))
+        if (GUI.Button(_sceneButtonsConfig.deleteLastPathRect, "Delete Last Path"))
         {
             if(pathsSaved.paths.Count > 0)
             {
@@ -247,7 +229,7 @@ public class SeedEditor : Editor
         if (pathsSaved.vessels.Count <= 0)
             return;
 
-        if (GUI.Button(new Rect(20, _deleteLastVesselYPos, buttonWidth, buttonHeight), "Delete Last Vessel"))
+        if (GUI.Button(_sceneButtonsConfig.deleteLastVesselRect, "Delete Last Vessel"))
         {
             if (pathsSaved.vessels.Count > 0)
             {
@@ -346,7 +328,7 @@ public class SeedEditor : Editor
 
         if (_target.mapLoaded)
         {
-            if (!saveMap && GUI.Button(new Rect(20, _overwriteMapYPos, buttonWidth, buttonHeight), "Overwrite Map"))
+            if (!saveMap && GUI.Button(_sceneButtonsConfig.overwriteMapRect, "Overwrite Map"))
             {
                 saveMap = true;
             }
@@ -385,50 +367,6 @@ public class SeedEditor : Editor
             }
             else
                 saveMap = false;
-
-            //if (saveMap && GUI.Button(new Rect(20, 180, buttonWidth, buttonHeight), "No"))
-            //{
-            //    saveMap = false;
-            //}
-            //if (saveMap && GUI.Button(new Rect(160, 180, buttonWidth, buttonHeight), "Yes"))
-            //{
-            //    //List<string> tempPath = new List<string>();
-
-            //    //var asset = AssetDatabase.FindAssets("t:MapsSaved", null);
-
-            //    //MapsSaved _targetcurrentMap = null;
-
-            //    //for (int i = asset.Length - 1; i >= 0; i--)
-            //    //{
-            //        //string path = AssetDatabase.GUIDToAssetPath(asset[i]);
-            //        ////separo las diferentes carpetas por el carcater /
-            //        //tempPath = path.Split('/').ToList();
-
-            //        //if (path == "Assets/" + _path + "/" + _mapName + ".asset")
-            //        //{
-            //        //    if (File.Exists(_fullPath + "/" + tempPath.Last()))
-            //        //    {
-            //        //        currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>("Assets/" + _path + "/" + _mapName + ".asset");
-            //        //        _seed.mapNameLoaded = _mapName;
-            //        //        _seed.mapLoaded = true;
-            //        //        break;
-            //        //    }
-            //        //}
-
-            //        ////obtengo todo el path
-            //        //string path = AssetDatabase.GUIDToAssetPath(asset[i]);
-            //        ////separo las diferentes carpetas por el carcater /
-            //        //tempPath = path.Split('/').ToList();
-            //        ////obtengo la ultima parte, que seria el nombre con la extension y saco la extension
-            //        //var currentMapName = tempPath.LastOrDefault().Split('.');
-            //        ////si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
-            //        //if (currentMapName[0] == _target.mapNameLoaded)
-            //        //{
-            //        //    currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);
-            //        //    break;
-            //        //}
-            //    //}
-            //}
         }
     }
 
@@ -506,7 +444,75 @@ public class SeedEditor : Editor
         }
 
         return default(Vector3);
-    }    
+    }
+
+    public void ConfigurateButtonsByDefault()
+    {
+        _sceneButtonsConfig.newMapRect.width = 130;
+        _sceneButtonsConfig.newMapRect.height = 30;
+
+        _sceneButtonsConfig.saveNewMapRect.width = 130;
+        _sceneButtonsConfig.saveNewMapRect.height = 30;
+
+        _sceneButtonsConfig.overwriteMapRect.width = 130;
+        _sceneButtonsConfig.overwriteMapRect.height = 30;
+
+        _sceneButtonsConfig.deleteLastPathRect.width = 130;
+        _sceneButtonsConfig.deleteLastPathRect.height = 30;
+
+        _sceneButtonsConfig.deleteLastVesselRect.width = 130;
+        _sceneButtonsConfig.deleteLastVesselRect.height = 30;
+
+        _sceneButtonsConfig.bringSeedRect.width = 130;
+        _sceneButtonsConfig.bringSeedRect.height = 30;
+
+        _sceneButtonsConfig.deletePathRect.width = 130;
+        _sceneButtonsConfig.deletePathRect.height = 30;
+
+        _sceneButtonsConfig.deleteVesselRect.width = 130;
+        _sceneButtonsConfig.deleteVesselRect.height = 30;
+
+        _sceneButtonsConfig.deleteCloserVesselsRect.width = 130;
+        _sceneButtonsConfig.deleteCloserVesselsRect.height = 30;
+
+        if (_sceneButtonsConfig.newMapRect.x == 0 && _sceneButtonsConfig.newMapRect.y == 0
+            && _sceneButtonsConfig.saveNewMapRect.x == 0 && _sceneButtonsConfig.saveNewMapRect.y == 0
+            && _sceneButtonsConfig.overwriteMapRect.x == 0 && _sceneButtonsConfig.overwriteMapRect.y == 0
+            && _sceneButtonsConfig.deleteLastPathRect.x == 0 && _sceneButtonsConfig.deleteLastPathRect.y == 0
+            && _sceneButtonsConfig.deleteLastVesselRect.x == 0 && _sceneButtonsConfig.deleteLastVesselRect.y == 0
+            && _sceneButtonsConfig.bringSeedRect.x == 0 && _sceneButtonsConfig.bringSeedRect.y == 0
+            && _sceneButtonsConfig.deletePathRect.x == 0 && _sceneButtonsConfig.deletePathRect.y == 0
+            && _sceneButtonsConfig.deleteVesselRect.x == 0 && _sceneButtonsConfig.deleteVesselRect.y == 0
+            && _sceneButtonsConfig.deleteCloserVesselsRect.x == 0 && _sceneButtonsConfig.deleteCloserVesselsRect.y == 0)
+        {
+            _sceneButtonsConfig.newMapRect.x = 20;
+            _sceneButtonsConfig.newMapRect.y = 20;
+
+            _sceneButtonsConfig.saveNewMapRect.x = 20;
+            _sceneButtonsConfig.saveNewMapRect.y = 60;
+
+            _sceneButtonsConfig.overwriteMapRect.x = 20;
+            _sceneButtonsConfig.overwriteMapRect.y = 100;
+
+            _sceneButtonsConfig.deleteLastPathRect.x = 20;
+            _sceneButtonsConfig.deleteLastPathRect.y = 140;
+
+            _sceneButtonsConfig.deleteLastVesselRect.x = 20;
+            _sceneButtonsConfig.deleteLastVesselRect.y = 180;
+
+            _sceneButtonsConfig.bringSeedRect.x = 20;
+            _sceneButtonsConfig.bringSeedRect.y = 40;
+
+            _sceneButtonsConfig.deletePathRect.x = 20;
+            _sceneButtonsConfig.deletePathRect.y = 80;
+
+            _sceneButtonsConfig.deleteVesselRect.x = 20;
+            _sceneButtonsConfig.deleteVesselRect.y = 40;
+
+            _sceneButtonsConfig.deleteCloserVesselsRect.x = 20;
+            _sceneButtonsConfig.deleteCloserVesselsRect.y = 80;
+        }
+    }
 
 }
 

@@ -8,11 +8,13 @@ using UnityEngine;
 [CustomEditor(typeof(Path))]
 public class PathEditor : Editor
 {
-    private Path _target;
+    Path _target;
 
     public PathConfig pathsSaved;
 
-    private Seed _seed;
+    Seed _seed;
+
+    SceneButtonsConfig _sceneButtonsConfig;
 
     int _buttonMinSize = 45;
     int _buttonMaxSize = 70;
@@ -24,6 +26,15 @@ public class PathEditor : Editor
     {
         _target = (Path)target;
         //_deletedByKey = false;
+        _sceneButtonsConfig = (SceneButtonsConfig)Resources.Load("SceneButtonsConfig");
+
+        if (_sceneButtonsConfig == null)
+        {
+            ScriptableObjectsCreator.CreateSceneButtonsConfig();
+            _sceneButtonsConfig = (SceneButtonsConfig)Resources.Load("SceneButtonsConfig");
+        }
+
+        EditorUtility.SetDirty(_sceneButtonsConfig);
     }
 
     public override void OnInspectorGUI()
@@ -67,7 +78,7 @@ public class PathEditor : Editor
 
     void DeleteActualPath()
     {
-        if (GUI.Button(new Rect(20, 100, 130, 30), "Delete path"))
+        if (GUI.Button(_sceneButtonsConfig.deletePathRect, "Delete path"))
         {
             //_deletedByKey = false;
             Delete();
@@ -163,7 +174,7 @@ public class PathEditor : Editor
 
     void SetAsActualPath()
     {
-        if (GUI.Button(new Rect(20, 50, 130, 30), "Bring seed"))
+        if (GUI.Button(_sceneButtonsConfig.bringSeedRect, "Bring seed"))
         {
             pathsSaved.paths[pathsSaved.paths.Count - 1].GetComponent<Path>().id = _target.id;
 

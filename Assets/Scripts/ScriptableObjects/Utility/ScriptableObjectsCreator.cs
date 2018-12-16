@@ -12,4 +12,9 @@ public class ScriptableObjectsCreator
     {
         ScriptableObjectUtility.CreateAsset<VesselsSaved>("Resources/VesselsConfig");
     }
+
+    public static void CreateSceneButtonsConfig()
+    {
+        ScriptableObjectUtility.CreateAsset<SceneButtonsConfig>("Resources/SceneButtonsConfig");
+    }
 }
