@@ -20,12 +20,10 @@ public class PathEditor : Editor
     int _buttonMaxSize = 70;
     int _angleToRotate;
 
-    //bool _deletedByKey;
-
     void OnEnable()
     {
         _target = (Path)target;
-        //_deletedByKey = false;
+
         _sceneButtonsConfig = (SceneButtonsConfig)Resources.Load("SceneButtonsConfig");
 
         if (_sceneButtonsConfig == null)
@@ -80,7 +78,6 @@ public class PathEditor : Editor
     {
         if (GUI.Button(_sceneButtonsConfig.deletePathRect, "Delete path"))
         {
-            //_deletedByKey = false;
             Delete();
         }
     }
@@ -125,9 +122,14 @@ public class PathEditor : Editor
         _target.currentIndex = EditorGUILayout.Popup("Actual type", _target.currentIndex, pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
 
         ShowPreview();
-        _target.id = EditorGUILayout.IntField("ID", _target.id);
+
+        //_target.id = EditorGUILayout.IntField("ID", _target.id);
 
         SwitchType();
+
+        if (GUILayout.Button("Modify path prefab"))
+            WindowModifyPathPrefab.CreateWindow();
+
     }
 
     void ShowPreview()

@@ -17,7 +17,6 @@ public class WindowLoadMaps : EditorWindow
     static void CreateWindow()
     {
         var window = ((WindowLoadMaps)GetWindow(typeof(WindowLoadMaps),false, "Load map"));
-        //window.titleContent = new GUIContent("Load map");
         window.Show();
         window.Init();        
     }
