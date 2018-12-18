@@ -121,6 +121,8 @@ public class PathEditor : Editor
 
         _target.currentIndex = EditorGUILayout.Popup("Actual type", _target.currentIndex, pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
 
+        pathsSaved.pathTypeSelected = _target.currentIndex;
+
         ShowPreview();
 
         //_target.id = EditorGUILayout.IntField("ID", _target.id);

@@ -19,6 +19,8 @@ public class PathConfig : ScriptableObject
     //[HideInInspector]
     public int totalPolygons;
     //[HideInInspector]
+    public int pathTypeSelected;
+    //[HideInInspector]
     public float maxVesselDistance;
     //[HideInInspector]
     public List<GameObject> vessels = new List<GameObject>();

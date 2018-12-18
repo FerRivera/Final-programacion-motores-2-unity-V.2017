@@ -45,6 +45,10 @@ public class SeedEditor : Editor
         EditorUtility.SetDirty(_sceneButtonsConfig);
 
         ConfigurateButtonsByDefault();
+
+        pathsSaved.objectsToInstantiate.Clear();
+
+        ConfigurateObjects();
         //sceneButtonsConfig.saveNewMapRect = new Rect(20, 60, buttonWidth, buttonHeight);
     }
 
@@ -65,7 +69,8 @@ public class SeedEditor : Editor
     {
         ConfigurateObjects();
 
-        _target.selectedIndex = EditorGUILayout.Popup("Path to create", _target.selectedIndex, pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
+        if(_target != null && pathsSaved != null)
+            _target.selectedIndex = EditorGUILayout.Popup("Path to create", _target.selectedIndex, pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
 
         ShowPreview();        
     }
@@ -295,6 +300,9 @@ public class SeedEditor : Editor
             temp.currentIndex = _target.selectedIndex;
             temp.id = pathsSaved.paths.Count;
         }
+
+        if (path.GetComponent<MeshRenderer>() == null)        
+            path.AddComponent<MeshRenderer>();
 
         if (pathsSaved.paths.Count > 0)
             lastObject = pathsSaved.paths[pathsSaved.paths.Count - 1];

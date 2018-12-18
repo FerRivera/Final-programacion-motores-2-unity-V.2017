@@ -14,6 +14,8 @@ public class WindowModifyPathPrefab : EditorWindow
     List<Material> _materials = new List<Material>();
     List<string> _materialsPath = new List<string>();
     Texture2D _preview;
+    GUIStyle _guiStyle = new GUIStyle();
+    List<MonoScript> _scripts = new List<MonoScript>();
 
     public static void CreateWindow()
     {
@@ -35,19 +37,128 @@ public class WindowModifyPathPrefab : EditorWindow
             _pathsSaved = (PathConfig)Resources.Load("PathConfig");
         }
 
+        _pathCurrentIndex = _pathsSaved.pathTypeSelected;
+
         StartDropListWithCurrentMaterial();
         ShowPreview();
+
+        _guiStyle.fontSize = 15;
+        _guiStyle.fontStyle = FontStyle.Bold;
+
+        GetAllScripts();
     }
 
     void OnGUI()
+    {        
+
+        EditorGUILayout.LabelField("Material:", _guiStyle);
+
+        EditorGUILayout.Space();
+
+        _pathCurrentIndex = EditorGUILayout.Popup("Prefab type", _pathCurrentIndex, _pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
+
+        ShowPreview();
+
+        EditorGUILayout.HelpBox("Changing the material will directly affect the prefab!", MessageType.Warning);
+
+        GetAllMaterials();
+
+        _selectedObject = (GameObject)_pathsSaved.objectsToInstantiate[_pathCurrentIndex];
+
+        if (_selectedObject.GetComponent<Renderer>() != null)
+            EditorGUILayout.LabelField("Prefab material:" + _selectedObject.GetComponent<Renderer>().sharedMaterial.name);
+
+        //_selectedObject.GetComponent<Renderer>().sharedMaterial = (Material)EditorGUILayout.ObjectField("Prefab material", _selectedObject.GetComponent<Renderer>().sharedMaterial, typeof(Material), true);
+
+        _materialCurrentIndex = EditorGUILayout.Popup("Materials", _materialCurrentIndex, _materials.Select(x => x.name).ToArray());
+
+        if (_selectedObject.GetComponent<Renderer>() != null)
+            _selectedObject.GetComponent<Renderer>().sharedMaterial = _materials[_materialCurrentIndex];        
+
+        UpdateAllPathsMaterial();
+
+        EditorGUILayout.Space();
+
+        EditorGUILayout.LabelField("Components:", _guiStyle);
+
+        EditorGUILayout.Space();
+
+        GetAllComponents();
+
+        UpdateAllPathsComponents();        
+
+        EditorGUILayout.LabelField("Add scripts:", _guiStyle);
+
+        //GetAllScripts();
+
+        EditorGUILayout.HelpBox("You are modificating the prefab, to update instantiated objects click the buttons or reload the map", MessageType.Info);
+    }
+
+    public void GetAllScripts()
+    {        
+        var assetPaths = AssetDatabase.GetAllAssetPaths().ToList();
+
+        foreach (string assetPath in assetPaths)
+        {
+            if (assetPath.EndsWith(".cs"))
+            {
+                var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
+                string temp = script.ToString();
+
+                if (temp.Contains("MonoBehaviour"))
+                    _scripts.Add(script);
+            }
+        }
+
+        for (int i = 0; i < assetPaths.Count; i++)
+        {
+
+        }
+
+        //foreach (var item in scripts)
+        //{
+        //    Rect rect = EditorGUILayout.BeginHorizontal();
+        //    rect.width = 150;
+        //    rect.height = 20;
+        //    rect.x = 200;
+        //    EditorGUILayout.LabelField("Component:" + item.GetType().Name);
+        //    if (GUI.Button(rect, "Delete component"))
+        //    {
+        //        DestroyImmediate(item, true);
+        //    }
+        //    EditorGUILayout.EndHorizontal();
+        //    EditorGUILayout.Space();
+        //}
+    }
+
+    public void GetAllComponents()
     {
-        _pathCurrentIndex = EditorGUILayout.Popup("Object type", _pathCurrentIndex, _pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
+        var components = _selectedObject.GetComponents<Component>().ToList();
 
-        ShowPreview();        
+        components.Remove(_selectedObject.GetComponent<Transform>());
+        components.Remove(_selectedObject.GetComponent<Renderer>());
 
+        foreach (var item in components)
+        {
+            Rect rect = EditorGUILayout.BeginHorizontal();
+            rect.width = 150;
+            rect.height = 20;
+            rect.x = 200;
+            EditorGUILayout.LabelField("Component:" + item.GetType().Name);
+            if (GUI.Button(rect, "Delete component"))
+            {
+                DestroyImmediate(item, true);
+            }
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.Space();
+        }
+    }
+
+    public void GetAllMaterials()
+    {
         _materialsPath = AssetDatabase.FindAssets("t:Material").ToList();
 
-        if(_materialsPath.Count != _materials.Count)
+        if (_materialsPath.Count != _materials.Count)
         {
             for (int i = 0; i < _materialsPath.Count(); i++)
             {
@@ -59,51 +170,24 @@ public class WindowModifyPathPrefab : EditorWindow
                     _materials.Add(material);
             }
         }
-
-        _selectedObject = (GameObject)_pathsSaved.objectsToInstantiate[_pathCurrentIndex];
-
-        EditorGUILayout.LabelField("Object material:" + _selectedObject.GetComponent<Renderer>().sharedMaterial.name);
-
-        _selectedObject.GetComponent<Renderer>().sharedMaterial = (Material)EditorGUILayout.ObjectField("Object material", _selectedObject.GetComponent<Renderer>().sharedMaterial, typeof(Material), true);
-
-        _materialCurrentIndex = EditorGUILayout.Popup("Materials", _materialCurrentIndex, _materials.Select(x => x.name).ToArray());
-
-        _selectedObject.GetComponent<Renderer>().sharedMaterial = _materials[_materialCurrentIndex];
-
-        EditorGUILayout.HelpBox("You are modificating the prefab, to update instantiated objects click the button or reload the map",MessageType.Info);
-
-        UpdateAllPathsMaterial();
-
-        for (int i = 0; i < 10; i++)
-        {
-            EditorGUILayout.Space();
-        }
-
-        var components = _selectedObject.GetComponents<Component>().ToList();
-
-        components.Remove(_selectedObject.GetComponent<Transform>());
-
-        foreach (var item in components)
-        {
-            
-            Rect rect = EditorGUILayout.BeginHorizontal();
-            rect.width = 150;
-            rect.height = 20;
-            rect.x = 200;
-            EditorGUILayout.LabelField("Component:" + item.GetType().Name);
-            if (GUI.Button(rect, "Delete component"))
-            {
-                DestroyImmediate(item,true);
-            }
-            EditorGUILayout.EndHorizontal();
-            EditorGUILayout.Space();
-            
-        }
     }
 
     public void UpdateAllPathsMaterial()
     {
-        if(GUI.Button(new Rect(5,170,150,50),"Update paths material"))
+        if(GUI.Button(new Rect(5, maxSize.y - 70, 160,50),"Update paths material"))
+        {
+            foreach (var item in _pathsSaved.paths)
+            {
+                int itemCurrentIndex = item.gameObject.GetComponent<Path>().currentIndex;
+                if (itemCurrentIndex == _pathCurrentIndex)
+                    item.GetComponent<Renderer>().sharedMaterial = _materials[_materialCurrentIndex];
+            }
+        }
+    }
+
+    public void UpdateAllPathsComponents()
+    {
+        if (GUI.Button(new Rect(205, maxSize.y - 70, 160, 50), "Update paths components"))
         {
             foreach (var item in _pathsSaved.paths)
             {
@@ -142,6 +226,9 @@ public class WindowModifyPathPrefab : EditorWindow
     void ShowPreview()
     {
         _preview = null;
+        if (_selectedObject.GetComponent<Renderer>() == null)
+            return;
+
         _preview = AssetPreview.GetAssetPreview(_selectedObject.GetComponent<Renderer>().sharedMaterial);
 
         if (_preview != null)
