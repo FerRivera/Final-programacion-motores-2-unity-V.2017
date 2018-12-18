@@ -7,6 +7,7 @@ using UnityEngine;
 public class WindowModifyPathPrefab : EditorWindow
 {
     int _pathCurrentIndex;
+    int _checkCurrentIndexChange;
     int _materialCurrentIndex;
     int _initialMaterialIndex;
     PathConfig _pathsSaved;
@@ -42,6 +43,7 @@ public class WindowModifyPathPrefab : EditorWindow
         }
 
         _pathCurrentIndex = _pathsSaved.pathTypeSelected;
+        _checkCurrentIndexChange = _pathsSaved.pathTypeSelected;
 
         StartDropListWithCurrentMaterial();
         ShowPreview();
@@ -54,11 +56,19 @@ public class WindowModifyPathPrefab : EditorWindow
 
     void OnGUI()
     {
+        //GetAllScripts();
+
         EditorGUILayout.LabelField("Material:", _guiStyle);
 
         EditorGUILayout.Space();
 
         _pathCurrentIndex = EditorGUILayout.Popup("Prefab type", _pathCurrentIndex, _pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
+
+        if(_checkCurrentIndexChange != _pathCurrentIndex)
+        {
+            _checkCurrentIndexChange = _pathCurrentIndex;
+            _scripts.Clear();
+        }
 
         ShowPreview();
 
@@ -100,42 +110,42 @@ public class WindowModifyPathPrefab : EditorWindow
 
     public void GetAllScripts()
     {
+        _scripts.Clear();
+
         var assetPaths = AssetDatabase.GetAllAssetPaths().ToList();
 
         var itemToRemove = assetPaths.Where(x => x.Contains(GetType().Name)).FirstOrDefault();
 
         assetPaths.Remove(itemToRemove);
 
-        foreach (string assetPath in assetPaths)
+        if (_selectedObject != null)
         {
-            if (assetPath.EndsWith(".cs"))
-            {
-                var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
-                string temp = script.ToString();
-
-                if (temp.Contains("MonoBehaviour"))
-                    _scripts.Add(script);
-            }
-        }        
-
-        if(_selectedObject != null)
-        {
-            _scriptsFinal = _scripts;
-            _scriptsTemp = _scriptsFinal;
-
             var scriptsAttachedToObject = _selectedObject.gameObject.GetComponents<MonoBehaviour>().ToList();
 
-            foreach (var scriptAttached in scriptsAttachedToObject)
+            foreach (string assetPath in assetPaths)
             {
-                foreach (var scriptTemp in _scriptsFinal)
+                if (assetPath.EndsWith(".cs"))
                 {
-                    if (scriptAttached.GetType().Name == scriptTemp.name)
-                        _scriptsTemp.Remove(scriptTemp);
+                    var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
+                    string temp = script.ToString();
+
+                    if (temp.Contains("MonoBehaviour"))
+                    {
+                        if(scriptsAttachedToObject.Count > 0)
+                        {
+                            foreach (var scriptAttached in scriptsAttachedToObject)
+                            {
+                                if (scriptAttached.GetType().Name != script.name && !_scripts.Contains(script))
+                                    _scripts.Add(script);
+                            }
+                        }
+                        else if(!_scripts.Contains(script))
+                            _scripts.Add(script);
+                    }
+
                 }
             }
-
-            _scriptsFinal = _scriptsTemp;
-        }        
+        }
     }
 
     public void DrawScriptsArea()
@@ -143,7 +153,7 @@ public class WindowModifyPathPrefab : EditorWindow
         EditorGUILayout.BeginVertical();
         _scrollScriptsPosition = EditorGUILayout.BeginScrollView(_scrollScriptsPosition, GUILayout.Width(maxSize.x), GUILayout.Height(100));
 
-        foreach (var item in _scriptsFinal)
+        foreach (var item in _scripts)
         {
             Rect rect = EditorGUILayout.BeginVertical();
             rect.width = 150;
@@ -153,7 +163,12 @@ public class WindowModifyPathPrefab : EditorWindow
 
             if (GUI.Button(rect, "Add Script"))
             {
-
+                var type = item.GetClass();
+                
+                if (type != null && _selectedObject.GetComponent(type) == null)
+                {
+                    _selectedObject.AddComponent(type);
+                }
             }
 
             EditorGUILayout.EndVertical();
@@ -280,13 +295,8 @@ public class WindowModifyPathPrefab : EditorWindow
         }
     }
 
-    private void OnFocus()
-    {
-        GetAllScripts();
-    }
-
     private void Update()
     {
-        //SceneView.RepaintAll();
+        GetAllScripts();
     }
 }
