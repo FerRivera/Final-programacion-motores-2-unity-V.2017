@@ -16,6 +16,10 @@ public class WindowModifyPathPrefab : EditorWindow
     Texture2D _preview;
     GUIStyle _guiStyle = new GUIStyle();
     List<MonoScript> _scripts = new List<MonoScript>();
+    List<MonoScript> _scriptsFinal = new List<MonoScript>();
+    List<MonoScript> _scriptsTemp = new List<MonoScript>();
+    Vector2 _scrollComponentsPosition;
+    Vector2 _scrollScriptsPosition;
 
     public static void CreateWindow()
     {
@@ -49,8 +53,7 @@ public class WindowModifyPathPrefab : EditorWindow
     }
 
     void OnGUI()
-    {        
-
+    {
         EditorGUILayout.LabelField("Material:", _guiStyle);
 
         EditorGUILayout.Space();
@@ -75,28 +78,33 @@ public class WindowModifyPathPrefab : EditorWindow
         if (_selectedObject.GetComponent<Renderer>() != null)
             _selectedObject.GetComponent<Renderer>().sharedMaterial = _materials[_materialCurrentIndex];        
 
-        UpdateAllPathsMaterial();
-
         EditorGUILayout.Space();
 
         EditorGUILayout.LabelField("Components:", _guiStyle);
 
         EditorGUILayout.Space();
 
-        GetAllComponents();
+        GetAllComponents();        
 
-        UpdateAllPathsComponents();        
+        EditorGUILayout.Space();
 
         EditorGUILayout.LabelField("Add scripts:", _guiStyle);
 
-        //GetAllScripts();
+        DrawScriptsArea();
+
+        UpdateAllPathsMaterial();
+        UpdateAllPathsComponents();
 
         EditorGUILayout.HelpBox("You are modificating the prefab, to update instantiated objects click the buttons or reload the map", MessageType.Info);
     }
 
     public void GetAllScripts()
-    {        
+    {
         var assetPaths = AssetDatabase.GetAllAssetPaths().ToList();
+
+        var itemToRemove = assetPaths.Where(x => x.Contains(GetType().Name)).FirstOrDefault();
+
+        assetPaths.Remove(itemToRemove);
 
         foreach (string assetPath in assetPaths)
         {
@@ -108,27 +116,52 @@ public class WindowModifyPathPrefab : EditorWindow
                 if (temp.Contains("MonoBehaviour"))
                     _scripts.Add(script);
             }
-        }
+        }        
 
-        for (int i = 0; i < assetPaths.Count; i++)
+        if(_selectedObject != null)
         {
+            _scriptsFinal = _scripts;
+            _scriptsTemp = _scriptsFinal;
 
+            var scriptsAttachedToObject = _selectedObject.gameObject.GetComponents<MonoBehaviour>().ToList();
+
+            foreach (var scriptAttached in scriptsAttachedToObject)
+            {
+                foreach (var scriptTemp in _scriptsFinal)
+                {
+                    if (scriptAttached.GetType().Name == scriptTemp.name)
+                        _scriptsTemp.Remove(scriptTemp);
+                }
+            }
+
+            _scriptsFinal = _scriptsTemp;
+        }        
+    }
+
+    public void DrawScriptsArea()
+    {
+        EditorGUILayout.BeginVertical();
+        _scrollScriptsPosition = EditorGUILayout.BeginScrollView(_scrollScriptsPosition, GUILayout.Width(maxSize.x), GUILayout.Height(100));
+
+        foreach (var item in _scriptsFinal)
+        {
+            Rect rect = EditorGUILayout.BeginVertical();
+            rect.width = 150;
+            rect.height = 20;
+            rect.x = 230;
+            EditorGUILayout.LabelField("Script:" + item.GetClass().Name);
+
+            if (GUI.Button(rect, "Add Script"))
+            {
+
+            }
+
+            EditorGUILayout.EndVertical();
+            EditorGUILayout.Space();
         }
 
-        //foreach (var item in scripts)
-        //{
-        //    Rect rect = EditorGUILayout.BeginHorizontal();
-        //    rect.width = 150;
-        //    rect.height = 20;
-        //    rect.x = 200;
-        //    EditorGUILayout.LabelField("Component:" + item.GetType().Name);
-        //    if (GUI.Button(rect, "Delete component"))
-        //    {
-        //        DestroyImmediate(item, true);
-        //    }
-        //    EditorGUILayout.EndHorizontal();
-        //    EditorGUILayout.Space();
-        //}
+        EditorGUILayout.EndScrollView();
+        EditorGUILayout.EndVertical();
     }
 
     public void GetAllComponents()
@@ -138,20 +171,26 @@ public class WindowModifyPathPrefab : EditorWindow
         components.Remove(_selectedObject.GetComponent<Transform>());
         components.Remove(_selectedObject.GetComponent<Renderer>());
 
+        EditorGUILayout.BeginVertical();
+        _scrollComponentsPosition = EditorGUILayout.BeginScrollView(_scrollComponentsPosition,GUILayout.Width(maxSize.x), GUILayout.Height(100));
+
         foreach (var item in components)
         {
-            Rect rect = EditorGUILayout.BeginHorizontal();
+            Rect rect = EditorGUILayout.BeginVertical();
             rect.width = 150;
             rect.height = 20;
-            rect.x = 200;
+            rect.x = 230;
             EditorGUILayout.LabelField("Component:" + item.GetType().Name);
             if (GUI.Button(rect, "Delete component"))
             {
                 DestroyImmediate(item, true);
             }
-            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
             EditorGUILayout.Space();
         }
+
+        EditorGUILayout.EndScrollView();
+        EditorGUILayout.EndVertical();
     }
 
     public void GetAllMaterials()
@@ -239,6 +278,11 @@ public class WindowModifyPathPrefab : EditorWindow
             GUILayout.Label(AssetDatabase.GetAssetPath(_selectedObject));
             GUILayout.EndHorizontal();
         }
+    }
+
+    private void OnFocus()
+    {
+        GetAllScripts();
     }
 
     private void Update()

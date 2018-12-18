@@ -57,7 +57,7 @@ public class WindowLoadMaps : EditorWindow
         EditorGUILayout.HelpBox("Last map loaded is written with bold letters", MessageType.Info);
 
         EditorGUILayout.BeginVertical(GUILayout.Height(maxYSize));
-        _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, true, true);        
+        _scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, true, true);
 
         MapsSaved currentMap = null;
 
