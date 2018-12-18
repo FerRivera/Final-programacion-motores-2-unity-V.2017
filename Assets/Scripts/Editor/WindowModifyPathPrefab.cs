@@ -17,8 +17,6 @@ public class WindowModifyPathPrefab : EditorWindow
     Texture2D _preview;
     GUIStyle _guiStyle = new GUIStyle();
     List<MonoScript> _scripts = new List<MonoScript>();
-    List<MonoScript> _scriptsFinal = new List<MonoScript>();
-    List<MonoScript> _scriptsTemp = new List<MonoScript>();
     Vector2 _scrollComponentsPosition;
     Vector2 _scrollScriptsPosition;
 
@@ -64,10 +62,10 @@ public class WindowModifyPathPrefab : EditorWindow
 
         _pathCurrentIndex = EditorGUILayout.Popup("Prefab type", _pathCurrentIndex, _pathsSaved.objectsToInstantiate.Select(x => x.name).ToArray());
 
-        if(_checkCurrentIndexChange != _pathCurrentIndex)
+        if (_checkCurrentIndexChange != _pathCurrentIndex)
         {
             _checkCurrentIndexChange = _pathCurrentIndex;
-            _scripts.Clear();
+            StartDropListWithCurrentMaterial();
         }
 
         ShowPreview();
@@ -116,7 +114,7 @@ public class WindowModifyPathPrefab : EditorWindow
 
         var itemToRemove = assetPaths.Where(x => x.Contains(GetType().Name)).FirstOrDefault();
 
-        assetPaths.Remove(itemToRemove);
+        assetPaths.Remove(itemToRemove);        
 
         if (_selectedObject != null)
         {
@@ -129,21 +127,29 @@ public class WindowModifyPathPrefab : EditorWindow
                     var script = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
                     string temp = script.ToString();
 
-                    if (temp.Contains("MonoBehaviour"))
+                    if (temp.Contains("MonoBehaviour") && !_scripts.Contains(script))
                     {
-                        if(scriptsAttachedToObject.Count > 0)
-                        {
-                            foreach (var scriptAttached in scriptsAttachedToObject)
-                            {
-                                if (scriptAttached.GetType().Name != script.name && !_scripts.Contains(script))
-                                    _scripts.Add(script);
-                            }
-                        }
-                        else if(!_scripts.Contains(script))
-                            _scripts.Add(script);
+                        _scripts.Add(script);
                     }
-
                 }
+            }
+
+            List<MonoScript> scriptToRemove = new List<MonoScript>();
+
+            foreach (var item in scriptsAttachedToObject)
+            {
+                foreach (var script in _scripts)
+                {
+                    if(script.name == item.GetType().Name)
+                    {
+                        scriptToRemove.Add(script);
+                    }
+                }
+            }
+
+            foreach (var item in scriptToRemove)
+            {
+                _scripts.Remove(item);
             }
         }
     }
