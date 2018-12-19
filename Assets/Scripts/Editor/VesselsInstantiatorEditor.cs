@@ -8,8 +8,6 @@ using UnityEngine;
 [ExecuteInEditMode]
 public class VesselsInstantiatorEditor : Editor
 {
-    //private VesselsInstantiator _target;
-
     public static bool editMode = false;
 
     List<string> layers;
@@ -68,15 +66,11 @@ public class VesselsInstantiatorEditor : Editor
 
     public override void OnInspectorGUI()
     {
-        //Primero mostramos los valores
         ShowValues();
 
-        //Luego arreglamos los valores que tengamos que arreglar
         FixValues();
 
-        //DrawDefaultInspector(); //Dibuja el inspector como lo hariamos normalmente. Sirve por si no queremos rehacher todo el inspector y solamente queremos agregar un par de funcionalidades.
-
-        Repaint(); //Redibuja el inspector
+        Repaint();
     }
 
     private void ShowValues()
@@ -198,16 +192,6 @@ public class VesselsInstantiatorEditor : Editor
             _currentTime += Time.deltaTime;
             insideVesselLimitStyle.fontSize = 20;
 
-            //var p = Camera.current.WorldToScreenPoint(preInstantiateVesselGo.transform.position);
-
-            //var size = Vector3.Distance(Camera.current.transform.position, preInstantiateVesselGo.transform.position);
-            //size = Mathf.Clamp(size, 45, 70);
-            //Debug.Log(Camera.current.transform.position);
-            //Debug.Log(p);
-            //Debug.Log(size);
-            //Vector3 tempLabelPosition = Camera.current.WorldToScreenPoint(new Vector3(preInstantiateVesselGo.transform.localPosition.x, preInstantiateVesselGo.transform.localPosition.y, preInstantiateVesselGo.transform.localPosition.z)).normalized;
-            //Vector3 tempLabelPosition = Camera.current.ScreenToWorldPoint(new Vector3(0, -Camera.current.pixelHeight, 0)).normalized;
-
             Handles.BeginGUI();
             insideVesselLimitStyle.fontSize = 20;
             if (_vesselsSaved != null)
@@ -216,7 +200,6 @@ public class VesselsInstantiatorEditor : Editor
             Vector2 pos2D = HandleUtility.WorldToGUIPoint(pos).normalized;
             GUI.Label(new Rect(Camera.current.pixelWidth/2-100, pos2D.y+40, 100, 100), "Inside vessel limit!", insideVesselLimitStyle);
             Handles.EndGUI();
-            //Handles.Label(tempLabelPosition, "Inside vessel limit!", _style);
         }
         else if(_currentTime > _totalTime)
         {

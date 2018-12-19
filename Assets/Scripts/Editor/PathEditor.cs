@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-//[ExecuteInEditMode]
 [CustomEditor(typeof(Path))]
 public class PathEditor : Editor
 {
@@ -234,23 +233,5 @@ public class PathEditor : Editor
             _seed.transform.position = new Vector3(0, 0, 0);
 
         DestroyImmediate(temp);
-    }
-
-    private void OnDestroy()
-    {
-        //if (!_deletedByKey)
-        //    return;
-
-        //if (_target == null)
-        //    return;
-
-        //if (PrefabUtility.GetPrefabType(_target) == PrefabType.None)
-        //    return;
-
-        //Selection.
-
-        //if (_target.hideFlags == HideFlags.None)
-        //    Delete();
-
     }
 }

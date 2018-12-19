@@ -14,7 +14,6 @@ public class ModifySceneButtonsEditor : EditorWindow
     static void CreateWindow()
     {
         var window = ((ModifySceneButtonsEditor)GetWindow(typeof(ModifySceneButtonsEditor), false, "Modify buttons"));
-        //window.titleContent = new GUIContent("Load map");
         window.Show();
         window.Init();
     }

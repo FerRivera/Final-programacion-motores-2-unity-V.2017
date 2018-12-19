@@ -5,24 +5,24 @@ using UnityEngine;
 
 public class VesselsSaved : ScriptableObject
 {
-    //[HideInInspector]
+    [HideInInspector]
     public float distance;
-    //[HideInInspector]
+    [HideInInspector]
     public int selectedIndex;
-    //[HideInInspector]
+    [HideInInspector]
     public LayerMask vessels;
-    //[HideInInspector]
+    [HideInInspector]
     public LayerMask map;
-    //[HideInInspector]
+    [HideInInspector]
     public bool showHelpBox;
-    //[HideInInspector]
+    [HideInInspector]
     public bool showVesselsLimits;
-    //[HideInInspector]
+    [HideInInspector]
     public Color gizmoInstantiatedVessel;
-    //[HideInInspector]
+    [HideInInspector]
     public Color gizmoPredictionVessel;
-    //[HideInInspector]
+    [HideInInspector]
     public Color editModeEnabled;
-    //[HideInInspector]
+    [HideInInspector]
     public Color insideVesselLimit;
 }

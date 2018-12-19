@@ -49,20 +49,15 @@ public class SeedEditor : Editor
         pathsSaved.objectsToInstantiate.Clear();
 
         ConfigurateObjects();
-        //sceneButtonsConfig.saveNewMapRect = new Rect(20, 60, buttonWidth, buttonHeight);
     }
 
     public override void OnInspectorGUI()
     {
-        //Primero mostramos los valores
         ShowValues();
 
-        //Luego arreglamos los valores que tengamos que arreglar
         FixValues();
 
-        //DrawDefaultInspector(); //Dibuja el inspector como lo hariamos normalmente. Sirve por si no queremos rehacher todo el inspector y solamente queremos agregar un par de funcionalidades.
-
-        Repaint(); //Redibuja el inspector
+        Repaint();
     }
 
     private void ShowValues()

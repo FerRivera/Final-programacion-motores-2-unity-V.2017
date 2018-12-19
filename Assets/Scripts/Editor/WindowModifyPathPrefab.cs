@@ -19,6 +19,7 @@ public class WindowModifyPathPrefab : EditorWindow
     List<MonoScript> _scripts = new List<MonoScript>();
     Vector2 _scrollComponentsPosition;
     Vector2 _scrollScriptsPosition;
+    string _scriptFilter;
 
     public static void CreateWindow()
     {
@@ -29,8 +30,8 @@ public class WindowModifyPathPrefab : EditorWindow
 
     public void Init()
     {
-        maxSize = new Vector2(501, 525);
-        minSize = new Vector2(500, 524);
+        maxSize = new Vector2(501, 585);
+        minSize = new Vector2(500, 584);
 
         _pathsSaved = (PathConfig)Resources.Load("PathConfig");
 
@@ -54,8 +55,6 @@ public class WindowModifyPathPrefab : EditorWindow
 
     void OnGUI()
     {
-        //GetAllScripts();
-
         EditorGUILayout.LabelField("Material:", _guiStyle);
 
         EditorGUILayout.Space();
@@ -97,13 +96,15 @@ public class WindowModifyPathPrefab : EditorWindow
         EditorGUILayout.Space();
 
         EditorGUILayout.LabelField("Add scripts:", _guiStyle);
-
+        EditorGUILayout.Space();
+        _scriptFilter = EditorGUILayout.TextField("Search script:", _scriptFilter);
+        EditorGUILayout.Space();
         DrawScriptsArea();
 
         UpdateAllPathsMaterial();
         UpdateAllPathsComponents();
 
-        EditorGUILayout.HelpBox("You are modificating the prefab, to update instantiated objects click the buttons or reload the map", MessageType.Info);
+        EditorGUILayout.HelpBox("You are modificating the prefab, to update instantiated objects click the buttons or save and load the map", MessageType.Info);
     }
 
     public void GetAllScripts()
@@ -152,6 +153,8 @@ public class WindowModifyPathPrefab : EditorWindow
                 _scripts.Remove(item);
             }
         }
+
+        _scripts = _scripts.OrderBy(x => x.name).ToList();
     }
 
     public void DrawScriptsArea()
@@ -161,11 +164,14 @@ public class WindowModifyPathPrefab : EditorWindow
 
         foreach (var item in _scripts)
         {
+            if (!string.IsNullOrEmpty(_scriptFilter) && !item.name.ToLower().Contains(_scriptFilter.ToLower()))
+                continue;
+
             Rect rect = EditorGUILayout.BeginVertical();
             rect.width = 150;
             rect.height = 20;
             rect.x = 230;
-            EditorGUILayout.LabelField("Script:" + item.GetClass().Name);
+            EditorGUILayout.LabelField(item.GetClass().Name);
 
             if (GUI.Button(rect, "Add Script"))
             {
@@ -201,8 +207,8 @@ public class WindowModifyPathPrefab : EditorWindow
             rect.width = 150;
             rect.height = 20;
             rect.x = 230;
-            EditorGUILayout.LabelField("Component:" + item.GetType().Name);
-            if (GUI.Button(rect, "Delete component"))
+            EditorGUILayout.LabelField(item.GetType().Name);
+            if (GUI.Button(rect, "Remove") && EditorUtility.DisplayDialog("Remove component?", "Are you sure you want to remove this component from the prefab?", "Yes", "No"))
             {
                 DestroyImmediate(item, true);
             }
@@ -249,11 +255,38 @@ public class WindowModifyPathPrefab : EditorWindow
     {
         if (GUI.Button(new Rect(205, maxSize.y - 70, 160, 50), "Update paths components"))
         {
+            List<MonoBehaviour> scriptToRemove = new List<MonoBehaviour>();
+
             foreach (var item in _pathsSaved.paths)
             {
                 int itemCurrentIndex = item.gameObject.GetComponent<Path>().currentIndex;
                 if (itemCurrentIndex == _pathCurrentIndex)
-                    item.GetComponent<Renderer>().sharedMaterial = _materials[_materialCurrentIndex];
+                {
+                    scriptToRemove.Clear();
+                    var scriptsAlreadyHave = item.GetComponents<MonoBehaviour>().ToList();
+                    var scriptsToAdd = _selectedObject.GetComponents<MonoBehaviour>().ToList();
+
+                    foreach (var script in scriptsToAdd)
+                    {
+                        foreach (var scripToCheck in scriptsAlreadyHave)
+                        {
+                            if (script.GetType().Name == scripToCheck.GetType().Name)
+                            {
+                                scriptToRemove.Add(script);
+                            }
+                        }
+                    }
+
+                    foreach (var itemToRemove in scriptToRemove)
+                    {
+                        scriptsToAdd.Remove(itemToRemove);
+                    }
+
+                    foreach (var itemToAdd in scriptsToAdd)
+                    {
+                        item.AddComponent(itemToAdd.GetType());
+                    }
+                }
             }
         }
     }

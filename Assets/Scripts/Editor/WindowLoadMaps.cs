@@ -74,10 +74,6 @@ public class WindowLoadMaps : EditorWindow
             if (!string.IsNullOrEmpty(_searchMap) && !currentMapName[0].ToLower().Contains(_searchMap.ToLower()))
                 continue;
 
-            //EditorGUI.BeginDisabledGroup(true);
-            //currentMapName[0] = EditorGUILayout.TextField("Map name", currentMapName[0]);
-
-
             if(_seed.mapLoadedIndex == i)
             {
                 EditorGUILayout.LabelField("Map name: " + currentMapName[0], EditorStyles.boldLabel);

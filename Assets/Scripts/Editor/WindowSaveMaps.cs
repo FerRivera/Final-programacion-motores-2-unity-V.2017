@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor; //Siempre que trabajamos con editor usamos UnityEditor
+using UnityEditor;
 using System.Threading;
 using System;
 using System.Linq;
 using System.IO;
 
-public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
+public class WindowSaveMaps : EditorWindow
 { 
 
     private bool _groupEnabled;
@@ -22,9 +22,9 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
     string noPathSelected = "No path selected";
     private Vector2 _scrollPosition;
 
-    public static void CreateWindow() // Crea la ventana a mostrar
+    public static void CreateWindow()
     {
-        var window = ((WindowSaveMaps)GetWindow(typeof(WindowSaveMaps))); //Esta línea va a obtener la ventana o a crearla. Una vez que haga esto, va a mostrarla.
+        var window = ((WindowSaveMaps)GetWindow(typeof(WindowSaveMaps)));
         window.titleContent = new GUIContent("Save new map");
         window.Show();
         window.Init();
@@ -73,9 +73,6 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
         if (pathsSaved == null)
             return;
 
-        //EditorGUILayout.BeginHorizontal(GUILayout.Width(maxYSize));
-        //_scrollPosition = EditorGUILayout.BeginScrollView(_scrollPosition, true, true);
-
         _mapName = EditorGUILayout.TextField("Map name", _mapName);
         
         if (String.IsNullOrEmpty(_mapName))
@@ -84,17 +81,12 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
         if (CheckIfNameExist(_mapName, _fullPath))
             EditorGUILayout.HelpBox("That name is already in use!", MessageType.Warning);
 
-        //EditorGUI.BeginDisabledGroup(true);
-        //_fullPath = EditorGUILayout.TextField("Path Selected", _fullPath);
-        //pathsSaved.totalPolygons = EditorGUILayout.IntField("Total polygons:", pathsSaved.totalPolygons);
-
         EditorGUILayout.LabelField("Path Selected: " + _fullPath);
 
         if (!CheckPathSelected())
             EditorGUILayout.HelpBox("Select the folder where you wish to save the map!", MessageType.Warning);
 
         EditorGUILayout.LabelField("Total polygons: " + pathsSaved.totalPolygons);
-        //EditorGUI.EndDisabledGroup();
 
         if (GUILayout.Button("Select folder"))
         {
@@ -166,17 +158,6 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
                                         }
                                     }
                                 }                                
-
-                                //obtengo la ultima parte, que seria el nombre con la extension y saco la extension
-                                //var currentMapName = tempPath.LastOrDefault().Split('.');
-                                //si el nombre que obtuve con el que escribi son iguales entonces uso ese scriptable object
-                                //if (currentMapName[0] == _mapName)
-                                //{
-                                //    currentMap = AssetDatabase.LoadAssetAtPath<MapsSaved>(path);                                
-                                //    _seed.mapNameLoaded = _mapName;
-                                //    _seed.mapLoaded = true;
-                                //    break;
-                                //}
                             }
 
                             if (currentMap != null)
@@ -205,9 +186,6 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
 
         if (pathsSaved.paths.Count <= 0)
             EditorGUILayout.HelpBox("There are no objects created in the map!", MessageType.Warning);        
-
-        //EditorGUILayout.EndScrollView();
-        //EditorGUILayout.EndHorizontal();
     }
 
     public bool CheckPathSelected()
@@ -243,7 +221,7 @@ public class WindowSaveMaps : EditorWindow // Tiene que heredar de Editor Window
         return false;
     }
 
-    void OnGUI() // Todo lo que se muestra en la ventana
+    void OnGUI()
     {
         SaveMap();
 
